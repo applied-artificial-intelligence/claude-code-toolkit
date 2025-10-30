@@ -13,7 +13,8 @@
     "orchestration"
   ],
   "commands": [
-    "./commands/*.md"
+    "./commands/agent.md",
+    "./commands/serena.md"
   ],
   "repository": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
   "license": "MIT"

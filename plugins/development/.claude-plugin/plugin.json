@@ -6,7 +6,14 @@
     "name": "Claude Code Framework"
   },
   "keywords": ["development", "testing", "quality", "analysis", "debugging", "documentation", "git"],
-  "commands": ["./commands/*.md"],
+  "commands": [
+    "./commands/analyze.md",
+    "./commands/docs.md",
+    "./commands/fix.md",
+    "./commands/git.md",
+    "./commands/review.md",
+    "./commands/test.md"
+  ],
   "agents": ["./agents/architect.md", "./agents/code-reviewer.md", "./agents/test-engineer.md"],
   "repository": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
   "license": "MIT"

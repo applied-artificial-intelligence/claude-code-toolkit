@@ -16,7 +16,13 @@
     "performance"
   ],
   "commands": [
-    "./commands/*.md"
+    "./commands/continue.md",
+    "./commands/handoff.md",
+    "./commands/index.md",
+    "./commands/memory-gc.md",
+    "./commands/memory-review.md",
+    "./commands/memory-update.md",
+    "./commands/performance.md"
   ],
   "repository": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
   "license": "MIT"

@@ -15,7 +15,12 @@
     "spike"
   ],
   "commands": [
-    "./commands/*.md"
+    "./commands/explore.md",
+    "./commands/plan.md",
+    "./commands/next.md",
+    "./commands/ship.md",
+    "./commands/work.md",
+    "./commands/spike.md"
   ],
   "repository": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
   "license": "MIT"
