@@ -2,27 +2,9 @@
   "name": "hello-world",
   "version": "1.0.0",
   "description": "Minimal example plugin demonstrating basic Claude Code plugin structure",
-  "author": "Claude Code Framework Examples",
+  "author": {
+    "name": "Claude Code Framework Examples"
+  },
   "keywords": ["example", "tutorial", "getting-started"],
-  "commands": ["commands/hello.md"],
-  "settings": {
-    "defaultEnabled": false,
-    "category": "examples"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/applied-artificial-intelligence/claude-agent-framework"
-  },
-  "license": "MIT",
-  "capabilities": {
-    "greeting": {
-      "description": "Say hello and demonstrate basic command structure",
-      "command": "hello"
-    }
-  },
-  "dependencies": {},
-  "mcpTools": {
-    "optional": [],
-    "gracefulDegradation": true
-  }
+  "commands": ["commands/hello.md"]
 }

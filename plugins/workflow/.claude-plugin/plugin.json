@@ -21,7 +21,5 @@
     "./commands/ship.md",
     "./commands/work.md",
     "./commands/spike.md"
-  ],
-  "repository": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
-  "license": "MIT"
+  ]
 }

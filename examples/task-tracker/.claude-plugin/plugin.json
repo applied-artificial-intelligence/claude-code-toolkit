@@ -2,35 +2,9 @@
   "name": "task-tracker",
   "version": "1.0.0",
   "description": "Example plugin demonstrating state management with JSON files",
-  "author": "Claude Code Framework Examples",
+  "author": {
+    "name": "Claude Code Framework Examples"
+  },
   "keywords": ["example", "tasks", "state-management", "json"],
-  "commands": ["commands/*.md"],
-  "settings": {
-    "defaultEnabled": false,
-    "category": "examples"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/applied-artificial-intelligence/claude-agent-framework"
-  },
-  "license": "MIT",
-  "capabilities": {
-    "taskList": {
-      "description": "List all tasks with their status",
-      "command": "tasks"
-    },
-    "taskAdd": {
-      "description": "Add a new task to the tracker",
-      "command": "task-add"
-    },
-    "taskComplete": {
-      "description": "Mark a task as completed",
-      "command": "task-done"
-    }
-  },
-  "dependencies": {},
-  "mcpTools": {
-    "optional": [],
-    "gracefulDegradation": true
-  }
+  "commands": ["commands/*.md"]
 }

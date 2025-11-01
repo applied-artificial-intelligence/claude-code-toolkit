@@ -18,7 +18,5 @@
     "./commands/cleanup.md",
     "./commands/setup.md",
     "./commands/status.md"
-  ],
-  "repository": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
-  "license": "MIT"
+  ]
 }

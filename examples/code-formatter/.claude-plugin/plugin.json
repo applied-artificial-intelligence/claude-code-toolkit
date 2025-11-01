@@ -2,44 +2,10 @@
   "name": "code-formatter",
   "version": "1.0.0",
   "description": "Example plugin demonstrating external tool integration and agent usage",
-  "author": "Claude Code Framework Examples",
+  "author": {
+    "name": "Claude Code Framework Examples"
+  },
   "keywords": ["example", "formatting", "agents", "integration"],
   "commands": ["commands/format.md"],
-  "agents": ["agents/style-checker.md"],
-  "settings": {
-    "defaultEnabled": false,
-    "category": "examples"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/applied-artificial-intelligence/claude-agent-framework"
-  },
-  "license": "MIT",
-  "capabilities": {
-    "codeFormatting": {
-      "description": "Format code files using external tools with AI validation",
-      "command": "format"
-    },
-    "styleChecking": {
-      "description": "Validate code style with AI-powered recommendations",
-      "agent": "style-checker"
-    }
-  },
-  "dependencies": {},
-  "mcpTools": {
-    "optional": [],
-    "gracefulDegradation": true
-  },
-  "externalTools": {
-    "prettier": {
-      "required": false,
-      "description": "JavaScript/TypeScript formatter",
-      "install": "npm install -g prettier"
-    },
-    "black": {
-      "required": false,
-      "description": "Python code formatter",
-      "install": "pip install black"
-    }
-  }
+  "agents": ["agents/style-checker.md"]
 }
