@@ -8,7 +8,7 @@
 
 The System plugin provides essential commands for configuring, monitoring, and maintaining Claude Code installations. These are system-level operations that configure or monitor Claude Code itself.
 
-## Commands (5)
+## Commands (9)
 
 ### /status
 **Purpose**: Unified view of work, system, and memory state
@@ -41,21 +41,78 @@ Interactive configuration management:
 /config reset
 ```
 
-### /setup
-**Purpose**: Initialize Claude Code in new projects
+### /setup:python
+**Purpose**: Initialize Python projects with Claude Code framework
 
-Sets up Claude Code framework structure:
-- Creates `.claude/` directory structure
-- Initializes configuration files
-- Sets up memory system
-- Configures work units
+Sets up Python project with configurable quality levels:
+- Creates modern `pyproject.toml` with development tools
+- Configures testing, linting, and type checking
+- Sets up `.claude/` directory structure
+- Initializes project memory and configuration
 
 **Options**:
 ```bash
-/setup                           # Interactive setup
-/setup --minimal                 # Minimal structure
-/setup --standard                # Standard structure (default)
-/setup --full                    # Full structure with examples
+/setup:python                    # Standard setup (production-ready)
+/setup:python --minimal          # Basic structure only
+/setup:python --standard         # Standard with pytest, ruff, mypy (default)
+/setup:python --full             # Comprehensive with docs, CI/CD
+/setup:python my-project         # Create new project with name
+```
+
+### /setup:javascript
+**Purpose**: Initialize JavaScript/Node.js projects with Claude Code framework
+
+Sets up JavaScript project with modern tooling:
+- Creates `package.json` with Jest, ESLint, Prettier
+- Configures testing and code quality tools
+- Sets up `.claude/` directory structure
+- Initializes project memory and configuration
+
+**Usage**:
+```bash
+/setup:javascript                # Initialize JavaScript project
+/setup:javascript my-app         # Create new project with name
+```
+
+### /setup:existing
+**Purpose**: Add Claude Code framework to existing projects
+
+Detects project type and adds appropriate framework structure:
+- Auto-detects Python or JavaScript projects
+- Creates `.claude/` directory structure without modifying existing files
+- Initializes configuration and memory system
+- Preserves all existing project structure
+
+**Usage**:
+```bash
+/setup:existing                  # Auto-detect and setup
+```
+
+### /setup:user
+**Purpose**: Initialize user-level Claude Code configuration
+
+Sets up global Claude Code configuration in `~/.claude/`:
+- Creates user-level `CLAUDE.md` with best practices
+- Initializes global memory templates
+- Configures user preferences
+
+**Options**:
+```bash
+/setup:user                      # Initialize user config
+/setup:user --force              # Overwrite existing config
+```
+
+### /setup:statusline
+**Purpose**: Configure Claude Code statusline display
+
+Sets up statusline to show framework information:
+- Configures statusline format
+- Shows active work unit
+- Displays memory state
+
+**Usage**:
+```bash
+/setup:statusline                # Configure statusline
 ```
 
 ### /audit
@@ -121,7 +178,9 @@ Intelligent cleanup operations:
 
 ### Project Initialization
 ```bash
-/setup --standard        # Initialize new project
+/setup:python --standard # Initialize Python project
+/setup:javascript        # Initialize JavaScript project
+/setup:existing          # Add framework to existing project
 /audit                   # Verify setup correct
 ```
 
@@ -152,9 +211,11 @@ Intelligent cleanup operations:
 - Keep configuration in version control
 
 ### Setup
-- Use `--standard` for most projects (good defaults)
-- Use `--minimal` for simple projects or experiments
-- Use `--full` when learning or exploring capabilities
+- Use `/setup:python --standard` for production Python projects
+- Use `/setup:python --minimal` for experiments or learning
+- Use `/setup:javascript` for Node.js applications
+- Use `/setup:existing` to add framework to existing projects without disruption
+- Use `/setup:user` once to configure global preferences
 
 ## Migration from Core Plugin
 
