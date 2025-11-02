@@ -86,9 +86,9 @@ TRANSITION_FILE=".claude/transitions/$UTC_DATE/$UTC_TIME.md"
 **IMPORTANT**: After I complete the handoff document, you must manually continue:
 
 1. Run `/clear` (the CLI command, not a slash command)
-2. Say: "continue" (I will automatically find and load the most recent transition)
+2. Say: "continue from .claude/transitions/YYYY-MM-DD/HHMMSS.md"
 
-**Note**: Auto-continue after `/clear` is NOT supported. You must explicitly tell me to continue.
+**Note**: You must explicitly tell me to continue after `/clear`. You must provide the transition file path - I cannot automatically reload it.
 
 ## User Continuation Steps
 
@@ -101,10 +101,10 @@ After I create the handoff document:
 
 **Step 2**: Tell me to continue
 ```
-continue
+continue from .claude/transitions/YYYY-MM-DD/HHMMSS.md
 ```
 
-I will automatically find and load the most recent transition using:
+When you say "continue from [file]", I will read that transition file. You can also just say "continue" and I will search for the most recent transition using:
 ```bash
 # Find most recent date directory
 LATEST_DATE=$(ls -1 .claude/transitions/ | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sort -r | head -1)
@@ -246,7 +246,7 @@ To continue:
 2. Say: "continue"
 ```
 
-**Important**: Auto-continuation is NOT supported. You must explicitly tell me to continue after `/clear`.
+**Important**: You must explicitly tell me to continue after `/clear`. Provide the full path to the transition file.
 
 ## Benefits
 
