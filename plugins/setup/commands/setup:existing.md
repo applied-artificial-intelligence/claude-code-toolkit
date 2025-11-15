@@ -24,8 +24,7 @@ echo "Detecting project characteristics..."
 # - Tools (pytest, Jest, etc.)
 
 # Create .claude directory structure
-mkdir -p $CLAUDE_DIR/work/current
-mkdir -p $CLAUDE_DIR/work/completed
+mkdir -p $CLAUDE_DIR/work
 mkdir -p $CLAUDE_DIR/memory
 mkdir -p $CLAUDE_DIR/reference
 mkdir -p $CLAUDE_DIR/hooks
@@ -49,14 +48,22 @@ cat > CLAUDE.md << EOF
 @.claude/memory/decisions.md
 
 ## Current Work
-@.claude/work/current/README.md
+@.claude/work/README.md
 EOF
 
 # Create work README
-cat > $CLAUDE_DIR/work/current/README.md << 'EOF'
-# Current Work
+cat > $CLAUDE_DIR/work/README.md << 'EOF'
+# Work Units
 
-Track active development tasks here.
+Active development work units are organized here with date-prefixed directories:
+- YYYY-MM-DD_NN_topic/ - Work unit format with date and running counter
+
+Each work unit contains:
+- metadata.json - Work unit metadata and status
+- state.json - Task tracking and implementation plan
+- Other relevant files for the work
+
+See workflow plugin commands (/explore, /plan, /next, /ship) for managing work units.
 EOF
 
 echo "✅ Claude Code Framework added!"

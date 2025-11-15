@@ -1,15 +1,15 @@
 ---
 allowed-tools: [Task, Bash, Read, Write, MultiEdit, Grep, Glob, TodoWrite]
-argument-hint: "[--task TASK-ID | --preview | --status]"
-description: "Execute the next available task from the implementation plan"
+argument-hint: "[--task TASK-ID | --parallel [N|auto] | --preview | --status]"
+description: "Execute the next available task(s) from the implementation plan with optional parallel execution"
 @import .claude/memory/conventions.md
 @import .claude/memory/lessons_learned.md
 @import .claude/memory/project_state.md
 ---
 
-# Task Execution
+# Task Execution (Enhanced with Parallel Execution)
 
-I'll execute the next available task from your implementation plan, ensuring quality and updating progress.
+I'll execute the next available task(s) from your implementation plan, with support for parallel execution of independent tasks.
 
 **Input**: $ARGUMENTS
 
@@ -21,7 +21,6 @@ I'll execute the next available task from your implementation plan, ensuring qua
 # Standard constants (must be copied to each command)
 readonly CLAUDE_DIR=".claude"
 readonly WORK_DIR="${CLAUDE_DIR}/work"
-readonly WORK_CURRENT="${WORK_DIR}/current"
 
 # Error handling functions (must be copied to each command)
 error_exit() {
@@ -45,11 +44,25 @@ require_tool() {
     fi
 }
 
-# Parse arguments
+# Parse arguments (ENHANCED for parallel execution)
 MODE="execute"
 TASK_ID=""
+PARALLEL_MODE="none"  # "none", "auto", "count", "interactive"
+PARALLEL_COUNT=1
+SPECIFIC_TASKS=()
 
-if [[ "$ARGUMENTS" == *"--preview"* ]]; then
+# Parse --parallel flag
+if [[ "$ARGUMENTS" == *"--parallel"* ]]; then
+    if [[ "$ARGUMENTS" =~ --parallel[[:space:]]+auto ]]; then
+        PARALLEL_MODE="auto"
+    elif [[ "$ARGUMENTS" =~ --parallel[[:space:]]+([0-9]+) ]]; then
+        PARALLEL_MODE="count"
+        PARALLEL_COUNT="${BASH_REMATCH[1]}"
+    elif [[ "$ARGUMENTS" == *"--parallel"* ]] && [[ ! "$ARGUMENTS" =~ --parallel[[:space:]]+ ]]; then
+        # Just "--parallel" with no args = interactive mode
+        PARALLEL_MODE="interactive"
+    fi
+elif [[ "$ARGUMENTS" == *"--preview"* ]]; then
     MODE="preview"
 elif [[ "$ARGUMENTS" == *"--status"* ]]; then
     MODE="status"
@@ -71,7 +84,7 @@ if [ -z "$ACTIVE_WORK" ]; then
     error_exit "Active work unit is empty"
 fi
 
-WORK_UNIT_DIR="${WORK_CURRENT}/${ACTIVE_WORK}"
+WORK_UNIT_DIR="${WORK_DIR}/${ACTIVE_WORK}"
 if [ ! -d "$WORK_UNIT_DIR" ]; then
     error_exit "Work unit directory not found: $WORK_UNIT_DIR"
 fi
@@ -84,8 +97,8 @@ fi
 
 # Verify jq is available for JSON parsing
 if ! command -v jq >/dev/null 2>&1; then
-    warn "jq not installed - some features may be limited"
-    # Fallback to basic grep/sed parsing if needed
+    warn "jq not installed - parallel execution requires jq"
+    PARALLEL_MODE="none"
 fi
 
 echo "📁 Active Work Unit: $ACTIVE_WORK"
@@ -143,20 +156,106 @@ case "$MODE" in
         ;;
 
     execute)
-        echo "🎯 Selecting next task..."
-        # Task selection logic would go here
-        # This is a simplified version - actual implementation would use jq to find next available task
+        if [ "$PARALLEL_MODE" != "none" ]; then
+            echo "🔍 Finding independent tasks for parallel execution..."
+
+            # Find independent tasks using jq
+            INDEPENDENT_TASKS_JSON=$(jq -c '
+              # Get completed task IDs
+              (.tasks[] | select(.status == "completed") | .id) as $completed |
+              [.tasks[] | select(.status == "completed") | .id] as $completed_ids |
+
+              # Find pending tasks with satisfied dependencies
+              [.tasks[] |
+                select(.status == "pending") |
+                select(
+                  (.dependencies // [] | length == 0) or
+                  (.dependencies // [] | all(. as $dep | $completed_ids | index($dep)))
+                )
+              ] as $available |
+
+              # Group by parallel_batch if it exists, otherwise treat each as independent
+              if ($available[0].parallel_batch // null) then
+                ($available | group_by(.parallel_batch) |
+                 max_by(length))
+              else
+                $available
+              end |
+
+              # Return task details for parallel execution
+              map({
+                id: .id,
+                title: .title,
+                description: .description,
+                type: .type,
+                priority: .priority // "medium",
+                dependencies: .dependencies // [],
+                acceptance_criteria: .acceptance_criteria // [],
+                estimated_hours: .estimated_hours // 0
+              })
+            ' "$STATE_FILE")
+
+            TASK_COUNT=$(echo "$INDEPENDENT_TASKS_JSON" | jq 'length')
+
+            if [ "$TASK_COUNT" -eq 0 ]; then
+                echo "⚠️  No independent tasks available for execution."
+                echo ""
+                echo "Possible reasons:"
+                echo "  • All pending tasks have unmet dependencies"
+                echo "  • All tasks are already completed"
+                echo "  • Tasks are blocked"
+                echo ""
+                echo "Run '/next --status' to see current state."
+                exit 0
+            fi
+
+            # Determine how many tasks to run
+            if [ "$PARALLEL_MODE" = "auto" ]; then
+                TASKS_TO_RUN=$TASK_COUNT
+                # Cap at 5 for safety
+                if [ $TASKS_TO_RUN -gt 5 ]; then
+                    TASKS_TO_RUN=5
+                fi
+            elif [ "$PARALLEL_MODE" = "count" ]; then
+                TASKS_TO_RUN=$PARALLEL_COUNT
+                if [ $TASKS_TO_RUN -gt $TASK_COUNT ]; then
+                    TASKS_TO_RUN=$TASK_COUNT
+                fi
+            elif [ "$PARALLEL_MODE" = "interactive" ]; then
+                # Display tasks and let user choose
+                echo "Found $TASK_COUNT independent tasks:"
+                echo ""
+                echo "$INDEPENDENT_TASKS_JSON" | jq -r '.[] | "  • \(.id): \(.title) [\(.priority | ascii_upcase)]"'
+                echo ""
+                echo "How many tasks to execute in parallel?"
+                echo "  (1-$TASK_COUNT, or 'all' for all tasks, max 5 recommended)"
+                read -p "Your choice: " USER_CHOICE
+
+                if [ "$USER_CHOICE" = "all" ]; then
+                    TASKS_TO_RUN=$TASK_COUNT
+                    if [ $TASKS_TO_RUN -gt 5 ]; then
+                        TASKS_TO_RUN=5
+                    fi
+                elif [[ "$USER_CHOICE" =~ ^[0-9]+$ ]] && [ "$USER_CHOICE" -ge 1 ] && [ "$USER_CHOICE" -le "$TASK_COUNT" ]; then
+                    TASKS_TO_RUN=$USER_CHOICE
+                else
+                    echo "Invalid choice. Defaulting to 1 task (sequential)."
+                    TASKS_TO_RUN=1
+                fi
+            fi
+
+            # Export task information for the main execution phase
+            echo "$INDEPENDENT_TASKS_JSON" | jq -r --argjson count "$TASKS_TO_RUN" '.[:$count]' > /tmp/claude_parallel_tasks_$$.json
+
+            echo ""
+            echo "✅ Will execute $TASKS_TO_RUN task(s) in parallel"
+            echo ""
+        else
+            # Traditional single task execution prep
+            echo "🎯 Selecting next task..."
+        fi
         ;;
 esac
-```
-
-## Usage
-
-```bash
-/next                    # Execute next available task
-/next --preview          # Show available tasks without executing
-/next --task TASK-003    # Execute specific task
-/next --status           # Show current task progress
 ```
 
 ## Phase 1: Load Work Context and Validate State
@@ -164,304 +263,364 @@ esac
 I'll check the work environment before proceeding:
 
 1. **Verify `.claude` directory exists** - Ensure we're in a Claude Code project
-2. **Check for active work unit** - Look for `.claude/work/current/ACTIVE_WORK`
+2. **Check for active work unit** - Look for `.claude/work/ACTIVE_WORK`
 3. **Validate state file** - Ensure `state.json` exists and contains tasks
 4. **Confirm readiness** - Work unit must be in `planning_complete` or `in_progress` status
 
 If any validation fails, I'll provide clear error messages and guidance on how to proceed.
 
-### Work Unit Context Loading
-I'll load the current work context to understand the project state:
+## Phase 2: Task Selection and Analysis (ENHANCED)
 
-1. **Find Active Work Unit**: Look for `.claude/work/current/ACTIVE_WORK` and associated work unit directory
-2. **Load Work Metadata**: Read `metadata.json` to understand work unit phase and status
-3. **Validate State File**: Ensure `state.json` exists and contains valid task breakdown
-4. **Check Phase Readiness**: Verify work unit is in a phase that allows task execution
+### Parallel Execution Mode
 
-### State Validation Requirements
-- Work unit must be in `implementing` or `planning_complete` phase
-- Valid `state.json` with task definitions and dependencies
-- No corrupted metadata or state files
-- Previous work should be committed to git
+When `--parallel` flag is used, I'll:
 
-## Phase 2: Task Selection and Analysis
+1. **Find All Independent Tasks**: Query state.json for pending tasks with satisfied dependencies
+2. **Group by Parallel Batch**: Use `parallel_batch` field if available, otherwise analyze dependencies
+3. **Detect File Conflicts**: Analyze task descriptions for potential file overlaps
+4. **Present Options**: Show user available tasks and get confirmation
+5. **Prepare Task List**: Export selected tasks for parallel execution
 
-### Task Selection Strategy
-I'll identify the next task to execute using this priority order:
+### Independent Task Detection Algorithm
 
-1. **Resume In-Progress Task**: If a task is currently marked as `in_progress`
-2. **High-Priority Available Tasks**: Tasks with all dependencies satisfied, ordered by priority
-3. **Critical Path Tasks**: Tasks that unblock the most other work
-4. **Parallel Opportunities**: Independent tasks that can be done concurrently
+```javascript
+// Implemented in jq within bash script
+function findIndependentTasks(state) {
+  // Get completed task IDs
+  const completedIds = state.tasks
+    .filter(t => t.status === "completed")
+    .map(t => t.id);
 
-### Task Information Analysis
-For the selected task, I'll analyze:
+  // Find pending tasks with satisfied dependencies
+  const available = state.tasks.filter(task =>
+    task.status === "pending" &&
+    task.dependencies.every(dep => completedIds.includes(dep))
+  );
 
-- **Task Type**: feature, bug, refactor, test, or documentation
-- **Dependencies**: Verify all prerequisite tasks are completed
-- **Acceptance Criteria**: Understand what constitutes task completion
-- **Integration Points**: Identify how this task connects to other work
-- **Estimated Effort**: Review time estimates and complexity assessment
+  // Group by parallel_batch if exists
+  if (available[0]?.parallel_batch) {
+    const batches = groupBy(available, t => t.parallel_batch);
+    return batches.sort((a, b) => b.length - a.length)[0];
+  }
 
-### Task Display Format
+  // Otherwise, all available tasks are independent
+  return available;
+}
 ```
-## Selected Task: TASK-XXX
 
-**Title**: [Descriptive task title]
-**Type**: feature|bug|refactor|test|docs
-**Description**: [What needs to be accomplished]
-**Dependencies**: [List of completed prerequisite tasks]
-**Estimated Time**: X hours
-**Priority**: High|Medium|Low
+### Task Display Format (Parallel Mode)
 
-### Acceptance Criteria
-- [ ] [Specific criterion 1]
-- [ ] [Specific criterion 2]
-- [ ] [Specific criterion 3]
+```
+🔍 Found 3 independent tasks:
+   • TASK-101: Implement memory-review command [HIGH]
+   • TASK-102: Implement memory-update command [HIGH]
+   • TASK-103: Implement memory-gc command [HIGH]
+
+How many tasks to execute in parallel?
+  (1-3, or 'all' for all tasks, max 5 recommended)
+Your choice: _
 ```
 
 ## Phase 3: Pre-Execution Validation
 
-### Environment Readiness Checks
-Before starting task execution:
+Same as before, with additions for parallel mode:
 
-1. **Dependency Verification**: Confirm all dependent tasks are truly complete
-2. **Git Status Check**: Ensure working directory is clean or changes are committed
-3. **Tool Availability**: Verify required development tools are available
-4. **Context Preparation**: Load necessary project context and documentation
+- **Parallel Safety Check**: Verify tasks are truly independent (no hidden dependencies)
+- **Resource Check**: Ensure system has capacity for parallel execution
+- **Conflict Warning**: Display any detected file conflicts
 
-### Quality Gate: Pre-Start
-- ✅ All task dependencies satisfied
-- ✅ Development environment ready
-- ✅ Previous work properly committed
-- ✅ Clean working directory state
-- ✅ Required tools accessible
+## Phase 4: Task Execution (ENHANCED for Parallel)
 
-## Phase 4: Task Execution
+### Parallel Execution Strategy
 
-### Execution Strategy by Task Type
+When multiple tasks are selected:
 
-#### Feature Development Tasks
-1. **Test-Driven Development**: Write failing tests first that define the feature
-2. **Minimal Implementation**: Implement just enough to make tests pass
-3. **Refactoring**: Improve code quality while keeping tests green
-4. **Integration**: Ensure feature integrates properly with existing code
-5. **Documentation**: Update relevant documentation and examples
+1. **Read Task Details**: Load full task information from temp file
+2. **Launch All Task Agents**: Single message with multiple Task tool invocations
+3. **Monitor Progress**: Track each agent's completion
+4. **Collect Results**: Gather success/failure status from all agents
+5. **Process Results**: Update state for each task independently
 
-#### Bug Fix Tasks
-1. **Issue Reproduction**: Create reliable reproduction steps for the bug
-2. **Test Creation**: Write tests that fail due to the bug
-3. **Root Cause Analysis**: Identify the underlying cause of the issue
-4. **Fix Implementation**: Apply minimal fix that resolves the root cause
-5. **Regression Prevention**: Ensure fix doesn't break other functionality
+### Task Agent Invocation Template
 
-#### Refactoring Tasks
-1. **Test Coverage Verification**: Ensure adequate tests exist before refactoring
-2. **Incremental Changes**: Make small, safe changes while maintaining functionality
-3. **Test Validation**: Run tests frequently to catch any breaking changes
-4. **Quality Improvement**: Improve code clarity, performance, or maintainability
-5. **Documentation Updates**: Update any documentation affected by changes
+For each task in the parallel batch, I'll invoke:
 
-#### Testing Tasks
-For comprehensive test creation, leverage test-engineer agent:
+```xml
+<invoke name="Task">
+  <parameter name="subagent_type">general-purpose</parameter>
+  <parameter name="description">Execute {task.id}: {task.title}</parameter>
+  <parameter name="prompt">
+You are executing task {task.id} from the implementation plan.
 
-**Agent Invocation Parameters**:
-- **subagent_type**: test-engineer
-- **description**: Create comprehensive test suite for [component]
-- **prompt**: Develop thorough testing including:
-  - Unit tests with edge cases and boundary conditions
-  - Integration tests for component interactions
-  - Test data fixtures and mock setups
-  - Performance benchmarks where applicable
-  - Coverage analysis and gap identification
+**Task**: {task.title}
+**Description**: {task.description}
+**Type**: {task.type}
+**Priority**: {task.priority}
 
-#### Documentation Tasks
-1. **Content Analysis**: Review what documentation needs creation or updates
-2. **Accuracy Verification**: Ensure documentation matches current implementation
-3. **Example Creation**: Develop practical usage examples and tutorials
-4. **Integration Updates**: Update README, API docs, and setup instructions
-5. **Quality Review**: Verify documentation is clear and helpful
+**Acceptance Criteria**:
+{criteria_list}
+
+**Dependencies** (all satisfied):
+{dependency_list}
+
+**Instructions**:
+1. Read and understand the task requirements thoroughly
+2. Implement the solution meeting all acceptance criteria
+3. Test your implementation thoroughly
+4. Update any relevant documentation
+5. Commit your changes with descriptive message
+
+**Verification Required**:
+- All acceptance criteria must be met
+- Tests must pass (create tests if none exist)
+- Code must follow project standards
+- Documentation must be updated
+
+**Return Format**:
+Provide a structured completion summary with:
+- **Status**: completed / blocked / failed
+- **Files Created/Modified**: List all files touched
+- **Tests Run**: Test results and coverage
+- **Issues Encountered**: Any problems or blockers
+- **Acceptance Criteria**: Mark each as ✅ met or ❌ not met
+- **Time Spent**: Actual hours spent
+
+Work autonomously but flag anything ambiguous or requiring user decision.
+  </parameter>
+</invoke>
+```
+
+**Critical**: All invocations must be in a **single message** for true parallel execution.
+
+### Sequential Execution (Fallback)
+
+If parallel execution not requested or only 1 task available, proceed with standard single-task execution.
 
 ## Phase 5: Continuous Quality Validation
 
-### During Execution
-Throughout task execution, maintain quality through:
+Same quality checks as before, applied per task:
 
-- **API Verification First**: Use Serena to verify APIs BEFORE writing code
-  - `get_symbols_overview()` to understand available methods
-  - `find_symbol()` to get exact signatures
-  - Never call methods you haven't verified exist
-- **Frequent Testing**: Run relevant test suites after each significant change
-- **Code Quality Checks**: Ensure linting and formatting standards are maintained
-- **Type Safety**: Verify type annotations and type checking (where applicable)
-- **Security Scanning**: Check for potential security vulnerabilities
-- **Performance Monitoring**: Ensure changes don't negatively impact performance
+- **API Verification First**: Use Serena to verify APIs before writing code
+- **Frequent Testing**: Run tests after significant changes
+- **Code Quality**: Maintain linting and formatting standards
+- **Security Scanning**: Check for vulnerabilities
 
-### Enhanced Validation (with MCP Tools)
+## Phase 6: Post-Execution Validation and State Updates (ENHANCED)
 
-#### Sequential Thinking Validation
-When complex reasoning is needed, use structured analysis to:
-- Systematically verify each acceptance criterion
-- Analyze potential edge cases and failure modes
-- Evaluate integration points and dependencies
-- Plan testing strategies for complex functionality
+### Parallel Results Processing
 
-#### Semantic Code Analysis (with Serena MCP)
-When Serena is available, enhance validation with:
-- Symbol-level impact analysis to understand affected code
-- Dependency tracking to identify integration risks
-- Type flow analysis to catch type-related issues
-- API surface validation for public interface changes
+After parallel execution completes:
 
-## Phase 6: Post-Execution Validation and State Updates
+1. **Parse Agent Results**: Extract completion status from each agent response
+2. **Categorize Results**: Group into completed, failed, blocked
+3. **Update State Per Task**: Process each task result independently
+4. **Maintain Consistency**: Ensure state.json remains valid even with partial failures
+5. **Generate Summary Report**: Clear breakdown of what succeeded and failed
 
-### Quality Gate: Post-Execution
-- ✅ All acceptance criteria met and verified
-- ✅ Test suite passes completely
-- ✅ Code quality checks pass (linting, formatting, types)
-- ✅ Documentation updated appropriately
-- ✅ Changes committed with descriptive messages
-- ✅ Integration verified with existing codebase
+### State Update Logic
 
-### State Management Updates
-After successful task completion:
+```javascript
+// For each task result from parallel execution
+for (const result of parallelResults) {
+  const task = state.tasks.find(t => t.id === result.taskId);
 
-1. **Update Task Status**: Mark task as completed in `state.json`
-2. **Record Completion Time**: Log actual time spent vs. estimate
-3. **Document Deliverables**: Record files changed and output produced
-4. **Update Dependencies**: Mark any newly available tasks
-5. **Archive Task Summary**: Create completion summary in work unit
+  if (result.status === "completed") {
+    task.status = "completed";
+    task.completed_at = new Date().toISOString();
+    task.actual_hours = result.timeSpent;
+    task.deliverables = result.filesCreated;
+  } else if (result.status === "blocked" || result.status === "failed") {
+    task.status = "blocked";
+    task.blocked_reason = result.error;
+    task.blocked_at = new Date().toISOString();
+  }
+}
 
-### Progress Tracking
-Using TodoWrite tool to maintain visible progress:
-- Mark current task as completed
-- Update overall work unit progress percentage
-- Identify next available tasks
-- Show critical path status
+// Update completed_tasks and next_available arrays
+state.completed_tasks = state.tasks
+  .filter(t => t.status === "completed")
+  .map(t => t.id);
+
+// Recalculate next available tasks
+state.next_available = findIndependentTasks(state.tasks, state.completed_tasks);
+
+// Save state
+fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+```
+
+### Parallel Execution Report Format
+
+```
+📊 Parallel Execution Results
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ TASK-101 (memory-review): COMPLETED
+   Files: commands/memory-review.md
+   Tests: 3/3 passed
+   Time: 2.5 hours
+
+✅ TASK-102 (memory-update): COMPLETED
+   Files: commands/memory-update.md
+   Tests: 4/4 passed
+   Time: 3.0 hours
+
+❌ TASK-103 (memory-gc): BLOCKED
+   Error: Missing dependency 'archival' module
+   Resolution: Install module or adjust implementation
+   State: Marked as blocked for investigation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📈 Progress: 12/15 tasks complete (80%)
+⏱️  Total Time: 5.5 hours (2.5 + 3.0 + partial)
+⚡ Efficiency: 60% time savings vs sequential
+
+🎯 Next Steps:
+   • Investigate TASK-103 blocker (install archival module)
+   • Run /workflow:next again for remaining 2 tasks
+   • Or run /workflow:next --task TASK-103 after resolving blocker
+```
 
 ## Phase 7: Automated Git Integration
 
-### Commit Strategy
-For each completed task:
+### Batch Commit Strategy
 
-1. **Stage Relevant Changes**: Add files modified during task execution
-2. **Generate Commit Message**: Create descriptive conventional commit message
-3. **Include Task Reference**: Link commit to specific task ID
-4. **Quality Attribution**: Include Claude Code attribution in commit
-5. **Verify Commit**: Ensure commit succeeds and meets quality standards
+For parallel execution, create a single commit encompassing all completed tasks:
 
-### Commit Message Format
 ```
-feat: Complete TASK-XXX - [Task Title]
+feat: Complete parallel batch - Tasks 101, 102
 
-Acceptance criteria met:
-- [Criterion 1] ✅
-- [Criterion 2] ✅
-- [Criterion 3] ✅
+Implemented memory management commands:
+- TASK-101: memory-review command ✅
+- TASK-102: memory-update command ✅
 
-Files modified: [list of key files]
-Tests: [new tests or test status]
+Files created:
+- commands/memory-review.md
+- commands/memory-update.md
+
+Tests: 7/7 passed
+Time: 5.5 hours (parallel execution)
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
+Alternative: Allow user to choose per-task commits or batch commit.
+
 ## Phase 8: Work Unit Health and Next Steps
 
-### Health Monitoring
-After each task completion:
+### Enhanced Next Steps for Parallel Mode
 
-1. **Work Unit Integrity**: Validate work unit structure and metadata
-2. **State Consistency**: Ensure task states and dependencies are logical
-3. **Progress Accuracy**: Verify progress calculations reflect reality
-4. **Context Health**: Check session memory and import links
-
-### Next Action Recommendations
-Based on completion, provide clear guidance:
-
-#### More Tasks Available
 ```
 🎯 NEXT STEPS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Task TASK-XXX completed successfully
-📊 Progress: X/Y tasks complete (Z%)
-→ Run `/next` again to continue with next task
-→ Next available: [TASK-YYY - Description]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Completed 2/3 tasks in parallel batch
+❌ 1 task blocked (TASK-103)
+📊 Progress: 12/15 tasks complete (80%)
+
+Options:
+  1. Resolve TASK-103 blocker, then run /workflow:next --task TASK-103
+  2. Run /workflow:next --parallel to execute remaining independent tasks
+  3. Run /workflow:next for sequential execution
+  4. Run /workflow:ship if all critical tasks complete
+
+Remaining independent tasks: 2
+Blocked tasks: 1 (needs resolution)
 ```
 
-#### All Tasks Complete
-```
-🎉 WORK UNIT COMPLETED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ All tasks completed successfully!
-📊 Final progress: Y/Y tasks complete (100%)
-→ Run `/ship` to finalize and deliver work
-→ Consider running `/review` for final quality check
-```
+## Command Options (ENHANCED)
 
-#### Blocked Tasks Detected
-```
-⚠️ ATTENTION NEEDED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Task TASK-XXX completed
-⚠️ Remaining tasks are blocked by: [dependency/issue]
-→ Resolve blocker: [specific action needed]
-→ Then run `/next` to continue
+### New: Parallel Execution
+
+```bash
+# Interactive: Ask which tasks to run in parallel
+/workflow:next --parallel
+
+# Auto: Run all independent tasks (max 5)
+/workflow:next --parallel auto
+
+# Specific count: Run N tasks in parallel
+/workflow:next --parallel 3
+
+# Traditional single task (default)
+/workflow:next
 ```
 
-## Command Options
+### Existing Options
 
-### Preview Mode (`--preview`)
-Shows available tasks and their status without executing:
-- List all tasks with current status
-- Show dependency relationships
-- Estimate remaining effort
-- Identify any blockers
+```bash
+/workflow:next --preview          # Show available tasks
+/workflow:next --task TASK-003    # Execute specific task
+/workflow:next --status           # Show progress
+```
 
-### Specific Task (`--task TASK-ID`)
-Execute a specific task if dependencies are satisfied:
-- Validate task exists and is available
-- Check all prerequisites are met
-- Execute specified task directly
-- Useful for parallel development
+## Error Handling (ENHANCED)
 
-### Status Check (`--status`)
-Display current progress and work unit health:
-- Show overall progress percentage
-- List recent completions
-- Identify current task in progress
-- Display next available tasks
+### Partial Failure Handling
 
-## Success Indicators
+When some parallel tasks succeed and others fail:
 
-Task execution is successful when:
-- ✅ Task selected based on dependencies and priority
-- ✅ All acceptance criteria met and verified
-- ✅ Quality gates passed (tests, linting, documentation)
-- ✅ Changes automatically committed with proper attribution
-- ✅ Work unit state accurately updated
-- ✅ Progress tracking maintained
-- ✅ Clear next steps provided
+1. **Process Successful Tasks**: Update state, commit changes
+2. **Mark Failed Tasks**: Set status to blocked with error details
+3. **Preserve Partial Progress**: Don't rollback successful work
+4. **Clear Reporting**: Show exactly what succeeded and what failed
+5. **Recovery Guidance**: Suggest specific next steps
 
-## Error Handling
+### File Conflict Resolution
 
-When task execution encounters issues:
+If multiple tasks modify the same file:
 
-1. **Document the Problem**: Capture error details and context
-2. **Preserve Progress**: Save any partially completed work
-3. **Mark Task Appropriately**: Set status to blocked or in-progress as appropriate
-4. **Identify Resolution Path**: Suggest specific steps to resolve the issue
-5. **Update State Safely**: Ensure work unit remains in valid state
+1. **Detection**: Git will show merge conflict
+2. **Reporting**: Failed tasks marked as blocked
+3. **Resolution**: User resolves conflict manually
+4. **Retry**: Tasks can be re-run with `/workflow:next --task {id}`
 
-## Integration Benefits
+### Complete Failure
 
-- **MCP Enhancement**: Leverages Sequential Thinking and Serena for complex tasks
-- **Quality Automation**: Automated testing, linting, and formatting checks
-- **Progress Transparency**: Clear visibility into work completion and next steps
-- **Git Integration**: Seamless version control with meaningful commit history
-- **Context Preservation**: Maintains work unit context across task executions
+If all tasks in parallel batch fail:
+
+1. **No State Changes**: Tasks remain pending
+2. **Error Analysis**: Display common causes
+3. **Diagnostic Steps**: Suggest investigation actions
+4. **Safe Rollback**: Work unit remains consistent
+
+## Success Indicators (ENHANCED)
+
+Parallel execution is successful when:
+
+- ✅ 2+ tasks launched in single invocation
+- ✅ All task agents complete (success or clear failure)
+- ✅ State updated correctly for all tasks
+- ✅ Partial failures handled gracefully
+- ✅ Clear results report generated
+- ✅ Next steps clearly communicated
+- ✅ 50%+ time savings vs sequential execution
+
+## Backwards Compatibility
+
+This enhanced command maintains full backwards compatibility:
+
+- **No --parallel flag**: Behaves exactly as before (single task)
+- **Old state.json format**: Works without `parallel_batch` field
+- **Existing workflows**: No breaking changes to current usage
+
+## Performance Expectations
+
+### Time Savings
+
+For 3 independent tasks averaging 3 hours each:
+
+- **Sequential**: 9 hours + user interaction time
+- **Parallel**: ~3 hours (longest task) + minimal overhead
+- **Savings**: ~67% wall-clock time, ~95% user interaction time
+
+### Token Efficiency
+
+- **Upfront Cost**: Higher (larger initial message with multiple Task invocations)
+- **Total Cost**: Lower (fewer Claude API calls, less context repetition)
+- **Net Benefit**: 20-30% token savings on multi-task workflows
 
 ---
 
-*Systematic task execution maintaining quality standards and clear progress tracking throughout implementation workflows.*
+*Systematic task execution with intelligent parallel processing for efficient multi-task implementation workflows.*

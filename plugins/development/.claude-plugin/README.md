@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Development Plugin provides comprehensive code development and quality assurance tools. It includes commands for analysis, testing, debugging, documentation, version control, review, and reporting, powered by specialized AI agents.
+The Development Plugin provides comprehensive code development and quality assurance tools. It includes commands for analysis, testing, debugging, execution, review, and reporting, powered by specialized AI agents.
 
 ## Commands
 
@@ -114,66 +114,28 @@ Universal debugging and fix application with semantic code analysis.
 
 ---
 
-### `/docs [subcommand] [arguments]`
-Unified documentation hub - fetch, search, and generate.
+### `/run [script|file]`
+Execute code or scripts with monitoring and timeout control.
 
-**Purpose**: Manage all documentation needs in one place
-
-**Subcommands**:
-- `fetch [url|package]`: Fetch external documentation
-- `search [query]`: Search all documentation
-- `generate`: Generate project documentation
+**Purpose**: Run scripts, execute code, monitor output
 
 **Usage**:
 ```bash
-/docs fetch https://docs.example.com         # Fetch web docs
-/docs fetch react                            # Fetch library docs
-/docs search "API endpoints"                 # Search documentation
-/docs generate                               # Generate project docs
+/run tests                                   # Run test script
+/run src/migration.py                        # Execute Python file
+/run "npm run build"                         # Run npm script
 ```
 
 **Features**:
-- External documentation fetching with caching
-- Cross-documentation search
-- Auto-generated project documentation
-- MCP Context7 integration for library docs
+- Output monitoring with filtering
+- Timeout control (default 2 min, max 10 min)
+- Background execution support
+- Error detection and reporting
 
-**MCP Enhancements**:
-- **Context7**: Fast library documentation lookup
-- **Firecrawl**: Web content extraction with caching
-
----
-
-### `/git [operation] [arguments]`
-Unified git operations - commits, pull requests, and issue management.
-
-**Purpose**: All git workflows in one command
-
-**Operations**:
-- `commit [message]`: Create safe commits with validation
-- `pr [--draft]`: Create pull requests
-- `issue [#num|title]`: Work on GitHub issues
-
-**Usage**:
-```bash
-/git commit "feat: Add authentication"       # Conventional commit
-/git commit                                  # Interactive commit
-/git pr                                      # Create PR from branch
-/git pr --draft                              # Create draft PR
-/git issue "#123"                            # Start work on issue
-```
-
-**Features**:
-- Safe commits with pre-commit validation
-- Conventional commit messages
-- Comprehensive PR creation
-- GitHub issue integration via gh CLI
-
-**Quality Gates**:
-- Test execution (if available)
-- Linting checks (if configured)
-- Secret detection
-- Commit message validation
+**Options**:
+- `--timeout SECONDS`: Set custom timeout
+- `--background`: Run in background
+- `--filter REGEX`: Filter output lines
 
 ---
 
@@ -239,6 +201,109 @@ Generate professional stakeholder reports from data.
 - Visualizations and charts
 - Executive summaries
 - Actionable recommendations
+
+---
+
+### `/experiment [config]`
+Run ML experiments with tracking.
+
+**Purpose**: Execute machine learning experiments with proper tracking and reproducibility
+
+**Usage**:
+```bash
+/experiment @experiment-config.yaml          # Run configured experiment
+/experiment "test transformer architecture"  # Ad-hoc experiment
+```
+
+**Features**:
+- Experiment configuration management
+- Hyperparameter tracking
+- Result logging and comparison
+- Reproducibility support
+
+**Agent**: `data-scientist` (ML specialist with structured reasoning)
+
+**MCP Enhancements**:
+- **Sequential Thinking**: Complex experiment design reasoning
+
+---
+
+### `/evaluate [experiments]`
+Compare experiments and identify best performers.
+
+**Purpose**: Analyze experiment results, compare models, identify winners
+
+**Usage**:
+```bash
+/evaluate @experiment-results/                # Evaluate all results
+/evaluate exp-001 exp-002 exp-003            # Compare specific experiments
+```
+
+**Outputs**:
+- Performance comparison tables
+- Statistical significance analysis
+- Best model identification
+- Recommendation for deployment
+
+**Agent**: `data-scientist`
+
+## Skills
+
+The Development Plugin includes **optional skills** that provide deep expertise through progressive disclosure. Skills activate automatically when relevant, loading only when needed to save tokens.
+
+### error-recovery-patterns
+
+**Activation**: When task execution fails, timeouts occur, or services become unavailable (10-20% of tasks)
+
+**Purpose**: Systematic error recovery and failure handling for distributed systems
+
+**Provides**:
+- Failure classification framework (transient vs permanent, recoverable vs fatal)
+- 5 core recovery patterns:
+  - Retry with exponential backoff (transient failures)
+  - Circuit breaker (repeated service failures)
+  - Transaction rollback (ACID databases)
+  - Compensating transactions / Saga pattern (distributed systems)
+  - Graceful degradation (non-critical failures)
+- Data consistency strategies (immediate, eventual, causal)
+- Failure prevention patterns (bulkhead, timeout, rate limiting)
+- Testing approaches (chaos engineering)
+
+**Value**: Prevents cascading failures and data corruption through systematic recovery
+
+**Token Efficiency**: Loads only when failures occur (8KB content vs 100 bytes metadata)
+
+---
+
+### data-modeling-patterns
+
+**Activation**: When designing database schemas or refactoring data models (15-20% of planning)
+
+**Purpose**: Database schema design and data modeling best practices
+
+**Provides**:
+- Normalization framework (1NF through 5NF, when to normalize/denormalize)
+- 3 core modeling patterns:
+  - Normalized schema (3NF for OLTP, data integrity)
+  - Denormalized schema (read-optimized for analytics)
+  - Hybrid (normalized core + materialized views)
+- Relationship patterns (1-to-many, many-to-many, 1-to-1, self-referencing)
+- Indexing strategy (types, when to index, trade-offs)
+- Schema evolution (backward-compatible changes, online migrations)
+- Domain-driven design (entity, value object, aggregate patterns)
+
+**Value**: Prevents expensive schema migrations through upfront design
+
+**Token Efficiency**: Loads only during schema design (9KB content vs 100 bytes metadata)
+
+---
+
+**Skills Usage**: Skills activate automatically based on context. You don't invoke them directly—Claude loads them when relevant to your current task.
+
+**Progressive Disclosure**: Skills use Anthropic's progressive disclosure system:
+- **Startup**: Only lightweight metadata loaded (~100 bytes per skill)
+- **Runtime**: Full content (8-9KB) loaded only when situational context triggers activation
+- **Efficiency**: 70-90% token savings vs always-on knowledge
 
 ---
 

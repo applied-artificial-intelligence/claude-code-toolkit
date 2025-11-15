@@ -124,8 +124,7 @@ echo ""
 echo "🔧 Adding Claude Code Framework..."
 
 # Create .claude directory structure (using shared-setup-patterns skill)
-mkdir -p $CLAUDE_DIR/work/current
-mkdir -p $CLAUDE_DIR/work/completed
+mkdir -p $CLAUDE_DIR/work
 mkdir -p $CLAUDE_DIR/memory
 mkdir -p $CLAUDE_DIR/reference
 mkdir -p $CLAUDE_DIR/hooks

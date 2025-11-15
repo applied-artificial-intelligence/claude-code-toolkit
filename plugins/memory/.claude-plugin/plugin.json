@@ -1,6 +1,6 @@
 {
   "name": "memory",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Active memory management and maintenance for Claude Code framework",
   "author": {
     "name": "Claude Code Framework"
@@ -10,10 +10,7 @@
     "maintenance",
     "context",
     "management",
-    "index",
-    "handoff",
-    "continue",
-    "performance"
+    "handoff"
   ],
   "commands": [
     "./commands/continue.md",
@@ -23,5 +20,7 @@
     "./commands/memory-review.md",
     "./commands/memory-update.md",
     "./commands/performance.md"
-  ]
+  ],
+  "repository": "https://github.com/yourusername/claude-code-plugins",
+  "license": "MIT"
 }

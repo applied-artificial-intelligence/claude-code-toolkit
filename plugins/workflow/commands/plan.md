@@ -135,7 +135,7 @@ I'll create a logical task sequence ensuring:
 
 ### State Management Setup
 
-I'll create structured state tracking in `.claude/work/current/[work-unit]/`:
+I'll create structured state tracking in `.claude/work/YYYY-MM-DD_NN_[work-unit]/`:
 
 #### state.json Structure
 ```json

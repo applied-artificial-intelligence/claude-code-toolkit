@@ -1,20 +1,19 @@
 {
   "name": "system",
   "version": "1.0.0",
-  "description": "System configuration and health management",
+  "description": "System health and maintenance",
   "author": {
     "name": "Claude Code Framework"
   },
-  "license": "MIT",
+  "keywords": ["system", "health", "audit", "maintenance"],
   "commands": [
     "./commands/audit.md",
     "./commands/cleanup.md",
-    "./commands/setup-python.md",
-    "./commands/setup-javascript.md",
-    "./commands/setup-existing.md",
-    "./commands/setup-user.md",
-    "./commands/setup-statusline.md",
     "./commands/status.md"
   ],
-  "keywords": ["system", "configuration", "health", "audit", "setup"]
+  "agents": [
+    "./agents/auditor.md",
+    "./agents/reasoning-specialist.md"
+  ],
+  "license": "MIT"
 }

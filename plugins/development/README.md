@@ -13,6 +13,7 @@ The Development plugin provides essential tools for building high-quality code. 
 - **Universal Debugging**: Fix errors, bugs, and code issues with semantic analysis
 - **Safe Execution**: Run scripts and code with monitoring and timeout control
 - **Code Review**: Systematic review for bugs, design flaws, and quality issues
+- **External Review Prep**: Package codebase for external review with RepoMix integration
 
 ## Commands
 
@@ -186,6 +187,82 @@ LOW Priority:
 - ✅ Regular code quality checks
 - ✅ Onboarding review
 - ✅ Security audits
+
+### `/prepare-review [focus_area_or_context]`
+Prepare external code review package using RepoMix with intelligent file selection and token-efficient formatting.
+
+**What it does**:
+- Intelligently selects relevant files for review
+- Includes project documentation (README, specs, PRDs)
+- Generates comprehensive review prompt
+- Creates RepoMix package in XML format (no line numbers)
+- Keeps token count <100k for external reviewer submission
+
+**Usage**:
+```bash
+/prepare-review                                 # Generic quality review
+/prepare-review "API authentication layer"      # Focus on specific area
+/prepare-review "Data pipeline error handling"  # Focus on specific concerns
+```
+
+**Review Package Includes**:
+1. **Review Prompt**: Clear guidance on what to review and how
+2. **Project Context**: README and specs (summarized if lengthy)
+3. **Codebase**: Token-efficient RepoMix package (XML, no line numbers)
+
+**Output Location**:
+```
+.claude/external_reviews/YYYY-MM-DD-HHMM/
+└── review_package.md    # Complete package ready to share
+```
+
+**Token Efficiency**:
+- Target: <100,000 tokens (ideally much less)
+- XML format for clean separation
+- No line numbers (saves 20-30% tokens)
+- Intelligent file selection (exclude utilities if not relevant)
+- Documentation summarization (50 pages → 5 pages when appropriate)
+
+**File Selection Intelligence**:
+- **Always Include**: Main entry points, core logic, API definitions, key architecture
+- **Usually Exclude**: Tests, build artifacts, dependencies, simple utilities
+- **Focus-Dependent**: Includes files relevant to specified focus area
+
+**Review Focus Areas** (default):
+- Architecture and overall design
+- Completeness (gaps, errors, omissions)
+- Best practices for stated goals
+- Maintainability and code quality
+- Component integration and logic
+
+**When to use**:
+- ✅ Before major architecture decisions
+- ✅ External expert review needed
+- ✅ Complex system requiring fresh perspective
+- ✅ Onboarding senior engineer for review
+- ✅ Pre-production quality gate
+
+**Requirements**:
+- RepoMix installed (`npm install -g repomix`) or available via `npx`
+- See: https://repomix.com
+
+**Example Output**:
+```
+✅ External review package prepared!
+
+Location: .claude/external_reviews/2025-11-14-0530/review_package.md
+
+Package Summary:
+- Focus: API authentication layer
+- Files included: 12 files (core auth modules)
+- Token count: ~47,000 tokens ✅
+- Format: XML (no line numbers)
+
+Next Steps:
+1. Review the package
+2. Copy entire review_package.md
+3. Submit to external reviewer
+```
 
 ## Agents
 
@@ -507,7 +584,7 @@ MIT License - see [LICENSE](../../LICENSE) for details.
 
 **Version**: 1.0.0
 **Category**: Development
-**Commands**: 5 (analyze, test, fix, run, review)
+**Commands**: 7 (analyze, docs, fix, git, prepare-review, review, test)
 **Agents**: 3 (architect, test-engineer, code-reviewer)
 **Dependencies**: core (^1.0.0)
 **MCP Tools**: Optional (sequential-thinking, serena, context7)

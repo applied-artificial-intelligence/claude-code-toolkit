@@ -5,18 +5,28 @@
   "author": {
     "name": "Claude Code Framework"
   },
-  "keywords": ["development", "testing", "quality", "analysis", "debugging", "documentation", "git"],
+  "keywords": [
+    "development",
+    "testing",
+    "quality",
+    "analysis",
+    "debugging",
+    "git"
+  ],
   "commands": [
     "./commands/analyze.md",
     "./commands/docs.md",
     "./commands/fix.md",
     "./commands/git.md",
+    "./commands/prepare-review.md",
     "./commands/review.md",
     "./commands/test.md"
   ],
-  "agents": ["./agents/architect.md", "./agents/code-reviewer.md", "./agents/test-engineer.md"],
-  "skills": [
-    "./skills/data-modeling-patterns",
-    "./skills/error-recovery-patterns"
-  ]
+  "agents": [
+    "./agents/architect.md",
+    "./agents/code-reviewer.md",
+    "./agents/test-engineer.md"
+  ],
+  "repository": "https://github.com/yourusername/claude-code-plugins",
+  "license": "MIT"
 }

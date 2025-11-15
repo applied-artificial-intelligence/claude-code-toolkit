@@ -1,0 +1,20 @@
+{
+  "name": "setup",
+  "version": "1.0.0",
+  "description": "Project initialization and Claude Code configuration",
+  "author": {
+    "name": "Claude Code Framework"
+  },
+  "keywords": ["setup", "initialization", "configuration", "project"],
+  "commands": [
+    "./commands/setup:python.md",
+    "./commands/setup:javascript.md",
+    "./commands/setup:existing.md",
+    "./commands/setup:user.md",
+    "./commands/setup:statusline.md"
+  ],
+  "skills": [
+    "./skills/shared-setup-patterns"
+  ],
+  "license": "MIT"
+}

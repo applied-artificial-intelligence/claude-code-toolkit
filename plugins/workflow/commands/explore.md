@@ -51,7 +51,6 @@ I'll help explore the requirements and codebase through structured analysis, fol
 # Standard constants (must be copied to each command)
 readonly CLAUDE_DIR=".claude"
 readonly WORK_DIR="${CLAUDE_DIR}/work"
-readonly WORK_CURRENT="${WORK_DIR}/current"
 readonly MEMORY_DIR="${CLAUDE_DIR}/memory"
 
 # Error handling functions (must be copied to each command)
@@ -106,40 +105,36 @@ if [ -n "$REQUIREMENT_SOURCE" ]; then
 fi
 echo ""
 
-# Generate or use provided work unit ID
-WORK_COUNTER_FILE="${WORK_DIR}/.counter"
+# Generate date-based work unit ID
 safe_mkdir "$WORK_DIR"
-safe_mkdir "$WORK_CURRENT"
+
+# Get current date for work unit prefix
+WORK_DATE=$(date +%Y-%m-%d)
 
 if [ -n "$WORK_UNIT_ID" ]; then
     # Use provided work unit ID
-    WORK_ID=$(printf "%03d" $WORK_UNIT_ID)
-    WORK_NAME="${WORK_ID}_exploration"
+    WORK_COUNTER=$(printf "%02d" $WORK_UNIT_ID)
+    WORK_NAME="${WORK_DATE}_${WORK_COUNTER}_exploration"
     if [ -n "$REQUIREMENT_SOURCE" ] && [ "$REQUIREMENT_TYPE" = "description" ]; then
         SLUG=$(echo "$REQUIREMENT_SOURCE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g' | sed 's/__*/_/g' | sed 's/^_//;s/_$//' | cut -c1-30)
-        WORK_NAME="${WORK_ID}_${SLUG}"
+        WORK_NAME="${WORK_DATE}_${WORK_COUNTER}_${SLUG}"
     fi
 else
-    # Read and increment counter
-    if [ -f "$WORK_COUNTER_FILE" ]; then
-        COUNTER=$(cat "$WORK_COUNTER_FILE" 2>/dev/null || echo "0")
-    else
-        COUNTER=0
-    fi
-    COUNTER=$((COUNTER + 1))
-    echo "$COUNTER" > "$WORK_COUNTER_FILE" || error_exit "Failed to update work counter"
+    # Find next counter for today's date
+    # Look for existing work units with today's date prefix
+    EXISTING_UNITS=$(find "$WORK_DIR" -maxdepth 1 -type d -name "${WORK_DATE}_*" 2>/dev/null | wc -l)
+    WORK_COUNTER=$(printf "%02d" $((EXISTING_UNITS + 1)))
 
-    # Create work unit ID and name
-    WORK_ID=$(printf "%03d" $COUNTER)
-    WORK_NAME="${WORK_ID}_exploration"
+    # Create work unit name
+    WORK_NAME="${WORK_DATE}_${WORK_COUNTER}_exploration"
     if [ -n "$REQUIREMENT_SOURCE" ] && [ "$REQUIREMENT_TYPE" = "description" ]; then
         # Create slug from description
         SLUG=$(echo "$REQUIREMENT_SOURCE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g' | sed 's/__*/_/g' | sed 's/^_//;s/_$//' | cut -c1-30)
-        WORK_NAME="${WORK_ID}_${SLUG}"
+        WORK_NAME="${WORK_DATE}_${WORK_COUNTER}_${SLUG}"
     fi
 fi
 
-WORK_UNIT_DIR="${WORK_CURRENT}/${WORK_NAME}"
+WORK_UNIT_DIR="${WORK_DIR}/${WORK_NAME}"
 
 # Create work unit directory structure
 echo "📁 Creating work unit: $WORK_NAME"
@@ -149,8 +144,9 @@ safe_mkdir "$WORK_UNIT_DIR"
 METADATA_FILE="${WORK_UNIT_DIR}/metadata.json"
 cat > "$METADATA_FILE" << EOF || error_exit "Failed to create metadata.json"
 {
-    "id": "$WORK_ID",
     "name": "$WORK_NAME",
+    "date": "$WORK_DATE",
+    "counter": "$WORK_COUNTER",
     "created_at": "$(date -Iseconds)",
     "requirement_type": "$REQUIREMENT_TYPE",
     "requirement_source": "$REQUIREMENT_SOURCE",
@@ -208,14 +204,14 @@ echo "Next: Analyzing requirements and codebase..."
 I'll establish a work unit to organize this exploration and track progress:
 
 ### Work Unit Creation
-1. **Generate Work Unit ID**: Create unique identifier for this work stream
-2. **Create Directory Structure**: Set up organized workspace in `.claude/work/current/`
+1. **Generate Date-Based ID**: Create date-prefixed identifier (YYYY-MM-DD_NN)
+2. **Create Directory Structure**: Set up organized workspace in `.claude/work/`
 3. **Initialize Metadata**: Record exploration context and objectives
 4. **Set Active Context**: Mark this as the current work unit
 
 ### Work Unit Structure
 ```
-.claude/work/current/NNN_topic/
+.claude/work/YYYY-MM-DD_NN_topic/
 ├── metadata.json          # Work unit metadata and status
 ├── requirements.md        # Captured requirements
 ├── exploration.md         # Exploration findings

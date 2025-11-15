@@ -10,16 +10,16 @@
     "explore",
     "plan",
     "next",
-    "ship",
-    "work",
-    "spike"
+    "ship"
   ],
   "commands": [
     "./commands/explore.md",
-    "./commands/plan.md",
     "./commands/next.md",
+    "./commands/plan.md",
     "./commands/ship.md",
-    "./commands/work.md",
-    "./commands/spike.md"
-  ]
+    "./commands/spike.md",
+    "./commands/work.md"
+  ],
+  "repository": "https://github.com/yourusername/claude-code-plugins",
+  "license": "MIT"
 }

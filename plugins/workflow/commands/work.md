@@ -18,8 +18,6 @@ Comprehensive work unit management with subcommands for continuing work, saving 
 # Standard constants (must be copied to each command)
 readonly CLAUDE_DIR=".claude"
 readonly WORK_DIR="${CLAUDE_DIR}/work"
-readonly WORK_CURRENT="${WORK_DIR}/current"
-readonly WORK_COMPLETED="${WORK_DIR}/completed"
 
 # Error handling functions (must be copied to each command)
 error_exit() {
@@ -67,8 +65,7 @@ elif [[ "$ARGUMENTS" =~ ^(active|paused|completed|all) ]]; then
 fi
 
 # Ensure work directory exists
-safe_mkdir "$WORK_CURRENT"
-safe_mkdir "$WORK_COMPLETED"
+safe_mkdir "$WORK_DIR"
 
 # Main execution
 if [ -z "$SUBCOMMAND" ]; then
@@ -77,10 +74,10 @@ if [ -z "$SUBCOMMAND" ]; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
-    # TODO: Implement work unit listing with proper filtering
-    # This is a simplified version - actual implementation would read metadata.json files
+    # List all work units (date-prefixed directories)
+    # Work units are now in format: YYYY-MM-DD_NN_topic
 
-    for work_dir in "$WORK_CURRENT"/*; do
+    for work_dir in "$WORK_DIR"/20*; do
         [ -d "$work_dir" ] || continue
         work_id=$(basename "$work_dir")
 
@@ -104,7 +101,7 @@ else
             fi
 
             # Validate work unit exists
-            if [ ! -d "${WORK_CURRENT}/${WORK_ID}" ]; then
+            if [ ! -d "${WORK_DIR}/${WORK_ID}" ]; then
                 error_exit "Work unit ${WORK_ID} not found"
             fi
 
@@ -120,7 +117,7 @@ else
             fi
 
             ACTIVE_ID=$(cat "${WORK_DIR}/ACTIVE_WORK")
-            CHECKPOINT_DIR="${WORK_CURRENT}/${ACTIVE_ID}/checkpoints"
+            CHECKPOINT_DIR="${WORK_DIR}/${ACTIVE_ID}/checkpoints"
             safe_mkdir "$CHECKPOINT_DIR"
 
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -144,7 +141,7 @@ EOF
                 error_exit "Work unit ID required for switch"
             fi
 
-            if [ ! -d "${WORK_CURRENT}/${WORK_ID}" ]; then
+            if [ ! -d "${WORK_DIR}/${WORK_ID}" ]; then
                 error_exit "Work unit ${WORK_ID} not found"
             fi
 
@@ -193,7 +190,7 @@ I'll determine which work management operation to perform:
 When listing work units:
 
 ### Work Unit Discovery
-1. **Scan Work Directory**: Examine `.claude/work/current/` for active work units
+1. **Scan Work Directory**: Examine `.claude/work/` for all work units (YYYY-MM-DD_NN_topic/)
 2. **Parse Metadata**: Read metadata.json files to understand work unit status
 3. **Identify Active Unit**: Check `ACTIVE_WORK` file for currently active work
 4. **Status Analysis**: Determine work unit phases and progress

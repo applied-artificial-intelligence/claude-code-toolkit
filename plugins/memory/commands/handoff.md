@@ -86,9 +86,9 @@ TRANSITION_FILE=".claude/transitions/$UTC_DATE/$UTC_TIME.md"
 **IMPORTANT**: After I complete the handoff document, you must manually continue:
 
 1. Run `/clear` (the CLI command, not a slash command)
-2. Say: "continue from .claude/transitions/YYYY-MM-DD/HHMMSS.md"
+2. Use `/memory:continue` OR say: "continue from .claude/transitions/YYYY-MM-DD/HHMMSS.md"
 
-**Note**: You must explicitly tell me to continue after `/clear`. You must provide the transition file path - I cannot automatically reload it.
+**Note**: `/memory:continue` may sometimes prioritize other activities first (like checking running processes). If this happens, run it again or provide the explicit transition file path.
 
 ## User Continuation Steps
 
@@ -99,24 +99,18 @@ After I create the handoff document:
 /clear
 ```
 
-**Step 2**: Tell me to continue
+**Step 2**: Resume work using ONE of these methods:
 ```
+# Option 1: Use the continue command (searches for latest transition)
+/memory:continue
+
+# Option 2: Provide explicit file path (more reliable)
 continue from .claude/transitions/YYYY-MM-DD/HHMMSS.md
 ```
 
-When you say "continue from [file]", I will read that transition file. You can also just say "continue" and I will search for the most recent transition using:
-```bash
-# Find most recent date directory
-LATEST_DATE=$(ls -1 .claude/transitions/ | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sort -r | head -1)
+⚠️ **Note**: `/memory:continue` may sometimes prioritize other activities before loading the transition. If this happens, either run it again or use Option 2 with the explicit file path.
 
-# Find most recent timestamp in that directory
-LATEST_TIME=$(ls -1 ".claude/transitions/$LATEST_DATE/" | grep -E '^[0-9]{6}\.md$' | sort -r | head -1)
-
-# Read the transition
-cat ".claude/transitions/$LATEST_DATE/$LATEST_TIME"
-```
-
-**Manual intervention required** - There is no automatic detection or loading after `/clear`.
+**Recommendation**: Always copy the transition file location when it's created, so you can provide it explicitly if needed for a smooth transition.
 
 ## Intelligence Guidelines
 
@@ -241,12 +235,14 @@ After creating handoff, I will tell you:
 
 Location: .claude/transitions/YYYY-MM-DD/HHMMSS.md
 
-To continue:
+To continue this work:
 1. Run /clear (the CLI command)
-2. Say: "continue"
+2. Use /memory:continue command OR say: "continue from .claude/transitions/YYYY-MM-DD/HHMMSS.md"
+
+⚠️ **Note**: /memory:continue may sometimes prioritize other activities first. If this happens, run it again or provide the explicit file path above.
 ```
 
-**Important**: You must explicitly tell me to continue after `/clear`. Provide the full path to the transition file.
+**Important**: You must explicitly tell me to continue after `/clear`.
 
 ## Benefits
 
