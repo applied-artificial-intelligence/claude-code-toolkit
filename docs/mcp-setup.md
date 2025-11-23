@@ -999,7 +999,7 @@ ping firecrawl.dev
 ### Reporting Issues
 
 **For Claude Code Plugins**:
-- GitHub Issues: https://github.com/[your-org]/claude-agent-framework/issues
+- GitHub Issues: https://github.com/applied-artificial-intelligence/claude-code-toolkit/issues
 
 **For MCP Servers**:
 - Report to respective MCP server repositories (see links above)

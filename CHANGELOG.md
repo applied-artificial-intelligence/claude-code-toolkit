@@ -222,7 +222,7 @@ With:
 
 ## Links
 
-- [GitHub Repository](https://github.com/applied-artificial-intelligence/claude-agent-framework)
+- [GitHub Repository](https://github.com/applied-artificial-intelligence/claude-code-toolkit)
 - [Migration Guide](MIGRATION.md)
 - [Documentation](README.md)
 - [Contributing Guide](CONTRIBUTING.md)

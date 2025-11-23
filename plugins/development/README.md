@@ -572,8 +572,8 @@ npm test
 ## Support
 
 - **Documentation**: [Development Guide](../../docs/guides/development.md)
-- **Issues**: [GitHub Issues](https://github.com/applied-artificial-intelligence/claude-agent-framework/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/applied-artificial-intelligence/claude-agent-framework/discussions)
+- **Issues**: [GitHub Issues](https://github.com/applied-artificial-intelligence/claude-code-toolkit/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/applied-artificial-intelligence/claude-code-toolkit/discussions)
 
 ## License
 

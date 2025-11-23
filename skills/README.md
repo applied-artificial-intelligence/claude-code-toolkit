@@ -231,24 +231,24 @@ Skills activate automatically based on context detection:
 
 ```bash
 # Copy all skills
-cp -r ~/applied-ai/claude-agent-framework/skills/* ~/.claude/skills/
+cp -r ~/applied-ai/claude-code-toolkit/skills/* ~/.claude/skills/
 
 # Or copy individually
-cp -r ~/applied-ai/claude-agent-framework/skills/rag-implementation ~/.claude/skills/
-cp -r ~/applied-ai/claude-agent-framework/skills/huggingface-transformers ~/.claude/skills/
-cp -r ~/applied-ai/claude-agent-framework/skills/llm-evaluation ~/.claude/skills/
+cp -r ~/applied-ai/claude-code-toolkit/skills/rag-implementation ~/.claude/skills/
+cp -r ~/applied-ai/claude-code-toolkit/skills/huggingface-transformers ~/.claude/skills/
+cp -r ~/applied-ai/claude-code-toolkit/skills/llm-evaluation ~/.claude/skills/
 ```
 
 ### Option 2: Symlink (For Development)
 
 ```bash
 # Symlink entire skills directory
-ln -s ~/applied-ai/claude-agent-framework/skills ~/.claude/skills
+ln -s ~/applied-ai/claude-code-toolkit/skills ~/.claude/skills
 
 # Or symlink individually
-ln -s ~/applied-ai/claude-agent-framework/skills/rag-implementation ~/.claude/skills/rag-implementation
-ln -s ~/applied-ai/claude-agent-framework/skills/huggingface-transformers ~/.claude/skills/huggingface-transformers
-ln -s ~/applied-ai/claude-agent-framework/skills/llm-evaluation ~/.claude/skills/llm-evaluation
+ln -s ~/applied-ai/claude-code-toolkit/skills/rag-implementation ~/.claude/skills/rag-implementation
+ln -s ~/applied-ai/claude-code-toolkit/skills/huggingface-transformers ~/.claude/skills/huggingface-transformers
+ln -s ~/applied-ai/claude-code-toolkit/skills/llm-evaluation ~/.claude/skills/llm-evaluation
 ```
 
 ### Verification
@@ -458,8 +458,8 @@ MIT License - Free to use, modify, and distribute.
 
 ## Support
 
-**Issues**: https://github.com/applied-artificial-intelligence/claude-agent-framework/issues
-**Discussions**: https://github.com/applied-artificial-intelligence/claude-agent-framework/discussions
+**Issues**: https://github.com/applied-artificial-intelligence/claude-code-toolkit/issues
+**Discussions**: https://github.com/applied-artificial-intelligence/claude-code-toolkit/discussions
 
 ---
 

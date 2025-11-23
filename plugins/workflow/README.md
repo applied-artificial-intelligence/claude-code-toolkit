@@ -491,8 +491,8 @@ See `examples/` directory for complete workflow examples:
 ## Support
 
 - **Documentation**: [Workflow Guide](../../docs/guides/workflow.md)
-- **Issues**: [GitHub Issues](https://github.com/applied-artificial-intelligence/claude-agent-framework/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/applied-artificial-intelligence/claude-agent-framework/discussions)
+- **Issues**: [GitHub Issues](https://github.com/applied-artificial-intelligence/claude-code-toolkit/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/applied-artificial-intelligence/claude-code-toolkit/discussions)
 
 ## License
 

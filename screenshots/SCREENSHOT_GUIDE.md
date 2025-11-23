@@ -11,7 +11,7 @@ Shows the plugin management interface with options to browse, install, add marke
 Alternative view showing available plugins.
 
 **03_add_market_place.png** - Adding marketplace
-Entering the local path to the claude-agent-framework repository.
+Entering the local path to the claude-code-toolkit repository.
 
 **04_system_setup.png** - `/system:setup` command
 System setup command showing available setup options.

@@ -4,7 +4,7 @@
     "name": "Applied Artificial Intelligence"
   },
   "description": "Production-ready workflow framework for Claude Code - structured development patterns, work management, and quality automation",
-  "homepage": "https://github.com/applied-artificial-intelligence/claude-agent-framework",
+  "homepage": "https://github.com/applied-artificial-intelligence/claude-code-toolkit",
   "plugins": [
     {
       "name": "system",
