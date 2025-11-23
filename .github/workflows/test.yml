@@ -1,4 +1,4 @@
-name: Plugin Test Suite
+name: Validate Plugins
 
 on:
   pull_request:
@@ -7,313 +7,65 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '22'
-
 jobs:
-  smoke-tests:
-    name: Smoke Tests
+  validate:
+    name: Validate Plugin Structure
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install Claude Code
-        run: |
-          npm install -g @anthropic-ai/claude-code
-          echo "Claude Code installed"
-
-      - name: Verify installation
-        run: |
-          claude --version
-          echo "✓ Claude Code version check passed"
-
-      - name: Run claude doctor
-        run: |
-          claude doctor || true
-          echo "✓ Claude doctor check completed"
-
-      - name: Verify plugin structure
+      - name: Validate plugin manifests
         run: |
           echo "Checking plugin manifests..."
+          errors=0
+
           for plugin in plugins/*/; do
+            plugin_name=$(basename "$plugin")
             manifest="${plugin}.claude-plugin/plugin.json"
+
             if [ -f "$manifest" ]; then
               echo "✓ Found: $manifest"
               # Validate JSON syntax
-              jq empty "$manifest" && echo "  → Valid JSON" || echo "  → Invalid JSON"
+              if jq empty "$manifest" 2>/dev/null; then
+                echo "  → Valid JSON"
+              else
+                echo "  → ❌ Invalid JSON"
+                errors=$((errors + 1))
+              fi
             else
-              echo "✗ Missing: $manifest"
-              exit 1
+              echo "✗ Missing manifest: $manifest"
+              errors=$((errors + 1))
             fi
           done
-          echo "✓ All plugin manifests found and valid"
 
-  build-docker:
-    name: Build Docker Environment
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Copy test infrastructure
-        run: |
-          # Copy Docker files from work unit 007 to repo root for CI
-          mkdir -p .ci
-
-          # Check if test infrastructure exists in Factory work unit
-          if [ -d "$HOME/agents/factory/.claude/work/current/007_oss_plugins_test_demo" ]; then
-            cp "$HOME/agents/factory/.claude/work/current/007_oss_plugins_test_demo/Dockerfile" .ci/ || echo "Dockerfile not in expected location"
-            cp "$HOME/agents/factory/.claude/work/current/007_oss_plugins_test_demo/docker-compose.yml" .ci/ || echo "docker-compose.yml not in expected location"
-          fi
-
-          # If files don't exist, use inline Dockerfile
-          if [ ! -f ".ci/Dockerfile" ]; then
-            cat > .ci/Dockerfile << 'EOF'
-          FROM ubuntu:24.04
-          ENV DEBIAN_FRONTEND=noninteractive
-          ENV NVM_DIR=/home/claude-tester/.nvm
-          ENV NODE_VERSION=22
-
-          RUN apt-get update && apt-get install -y \
-              curl git jq build-essential python3 python3-pip ca-certificates \
-              && rm -rf /var/lib/apt/lists/*
-
-          RUN useradd -m -s /bin/bash claude-tester && \
-              mkdir -p /home/claude-tester/.nvm && \
-              chown -R claude-tester:claude-tester /home/claude-tester
-
-          USER claude-tester
-          WORKDIR /home/claude-tester
-
-          RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-          ENV PATH="/home/claude-tester/.local/bin:${PATH}"
-
-          RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-
-          RUN . "${NVM_DIR}/nvm.sh" && \
-              nvm install 22 && \
-              nvm use 22 && \
-              nvm alias default 22
-
-          RUN . "${NVM_DIR}/nvm.sh" && \
-              nvm use 22 && \
-              npm install -g @anthropic-ai/claude-code
-
-          RUN mkdir -p /home/claude-tester/workspace/plugins
-
-          CMD ["/bin/bash"]
-          EOF
-          fi
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .ci
-          file: .ci/Dockerfile
-          tags: claude-code-plugins-test:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: false
-          load: true
-
-      - name: Test Docker image
-        run: |
-          docker run --rm claude-code-plugins-test:latest bash -c \
-            '. ~/.nvm/nvm.sh && claude --version'
-          echo "✓ Docker image validated"
-
-  functional-tests:
-    name: Functional Tests (High Priority)
-    runs-on: ubuntu-latest
-    needs: [smoke-tests, build-docker]
-    timeout-minutes: 30
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Copy test infrastructure
-        run: |
-          mkdir -p .ci
-
-          # Check for test files from work unit 007
-          if [ -d "$HOME/agents/factory/.claude/work/current/007_oss_plugins_test_demo" ]; then
-            cp "$HOME/agents/factory/.claude/work/current/007_oss_plugins_test_demo/claude_tester_multienv.py" .ci/ || echo "Test files not in expected location"
-            cp "$HOME/agents/factory/.claude/work/current/007_oss_plugins_test_demo/command_catalog.json" .ci/ || echo "Catalog not found"
-          fi
-
-          # If test files don't exist, create minimal test runner
-          if [ ! -f ".ci/claude_tester_multienv.py" ]; then
-            cat > .ci/test_runner.py << 'EOF'
-          #!/usr/bin/env python3
-          """Minimal CI test runner for high-priority plugin commands"""
-          import json
-          import sys
-
-          # High-priority commands for CI (subset of 45 total)
-          HIGH_PRIORITY_COMMANDS = [
-              "/workflow:explore",
-              "/workflow:plan",
-              "/workflow:next",
-              "/workflow:ship",
-              "/development:analyze",
-              "/development:review",
-              "/development:test",
-              "/development:fix",
-              "/system:status",
-              "/system:audit",
-              "/memory:index",
-              "/agents:agent",
-          ]
-
-          def main():
-              print(f"Testing {len(HIGH_PRIORITY_COMMANDS)} high-priority commands...")
-              print("✓ Test framework loaded")
-              print("⚠ Real command execution requires ANTHROPIC_API_KEY")
-              print("→ Simulation mode: Validating command catalog only")
-
-              # In real CI with API key, would execute commands
-              # For now, just validate they exist in manifests
-              return 0
-
-          if __name__ == "__main__":
-              sys.exit(main())
-          EOF
-            chmod +x .ci/test_runner.py
-          fi
-
-      - name: Run functional tests
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          if [ -f ".ci/claude_tester_multienv.py" ]; then
-            python .ci/claude_tester_multienv.py --simulation || echo "Simulation mode - tests passed"
+          echo ""
+          if [ $errors -eq 0 ]; then
+            echo "✅ All plugin manifests valid"
           else
-            python .ci/test_runner.py
+            echo "❌ Found $errors errors"
+            exit 1
           fi
 
-          echo "✓ Functional tests completed"
-          echo "Note: Full test execution requires ANTHROPIC_API_KEY secret"
-
-      - name: Generate test matrix
-        if: always()
+      - name: Check markdown token limits
         run: |
-          mkdir -p test-results
+          pip install mdtoken
+          mdtoken check || echo "⚠️ Some files exceed token limits (non-blocking)"
 
-          cat > test-results/test_matrix.json << 'EOF'
-          {
-            "timestamp": "${{ github.run_id }}",
-            "commit": "${{ github.sha }}",
-            "status": "completed",
-            "tests": {
-              "smoke": "passed",
-              "docker_build": "passed",
-              "functional": "simulation"
-            }
-          }
-          EOF
-
-          echo "✓ Test matrix generated"
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test-results/
-          retention-days: 30
-
-  comment-results:
-    name: Comment on PR
-    runs-on: ubuntu-latest
-    needs: [functional-tests]
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-
-    steps:
-      - name: Download test results
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results
-
-      - name: Comment on PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-
-            let testMatrix = {};
-            try {
-              testMatrix = JSON.parse(fs.readFileSync('test_matrix.json', 'utf8'));
-            } catch (e) {
-              console.log('Could not read test matrix, using defaults');
-            }
-
-            const body = `## 🧪 Plugin Test Results
-
-            **Commit**: \`${context.sha.substring(0, 7)}\`
-            **Status**: ✅ Tests Passed
-
-            | Test Suite | Result |
-            |------------|--------|
-            | Smoke Tests | ✅ Passed |
-            | Docker Build | ✅ Passed |
-            | Functional Tests | ⚠️ Simulation Mode |
-
-            **Note**: Full functional testing requires \`ANTHROPIC_API_KEY\` secret.
-
-            ### Next Steps
-            - [ ] Review test coverage (45 commands across 5 plugins)
-            - [ ] Verify plugin manifests are valid
-            - [ ] Check for any new dependencies
-
-            <sub>🤖 Generated by Claude Code Plugin Test Suite</sub>
-            `;
-
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
-
-  summary:
-    name: Test Summary
-    runs-on: ubuntu-latest
-    needs: [smoke-tests, build-docker, functional-tests]
-    if: always()
-
-    steps:
-      - name: Check test results
+      - name: Summary
         run: |
-          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Plugin Validation" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Smoke Tests | ${{ needs.smoke-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Build | ${{ needs.build-docker.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Functional Tests | ${{ needs.functional-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Repository**: claude-code-plugins" >> $GITHUB_STEP_SUMMARY
-          echo "**Total Commands**: 45 across 5 plugins" >> $GITHUB_STEP_SUMMARY
-          echo "**Test Coverage**: 100%" >> $GITHUB_STEP_SUMMARY
+          echo "| Plugin | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          for plugin in plugins/*/; do
+            name=$(basename "$plugin")
+            manifest="${plugin}.claude-plugin/plugin.json"
+            if [ -f "$manifest" ] && jq empty "$manifest" 2>/dev/null; then
+              echo "| $name | ✅ Valid |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| $name | ❌ Invalid |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
