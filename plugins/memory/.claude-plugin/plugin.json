@@ -1,7 +1,7 @@
 {
   "name": "memory",
   "version": "1.0.0",
-  "description": "Active memory management and maintenance for Claude Code framework",
+  "description": "Persistent memory management and knowledge indexing for Claude Code framework",
   "author": {
     "name": "Claude Code Framework"
   },
@@ -10,11 +10,10 @@
     "maintenance",
     "context",
     "management",
-    "handoff"
+    "knowledge",
+    "indexing"
   ],
   "commands": [
-    "./commands/continue.md",
-    "./commands/handoff.md",
     "./commands/index.md",
     "./commands/memory-gc.md",
     "./commands/memory-review.md",

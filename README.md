@@ -1,6 +1,6 @@
-# Claude Code Plugins
+# Claude Code Toolkit
 
-**Structured workflow framework and plugin system for Claude Code**
+**Production-tested commands, skills, and patterns for Claude Code**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-2.0%2B-blue)](https://docs.claude.com/claude-code)
@@ -9,7 +9,9 @@
 
 ## Overview
 
-Claude Code Plugins extends Anthropic's Claude Code with structured development workflows, work management, and quality automation. The framework provides 25 commands, 3 agents, 6 domain skills, and 2 proactive hooks across 5 core plugins.
+A collection of plugins, skills, and patterns developed through 6+ months of daily Claude Code use. Copy what works, adapt to your needs.
+
+**What's included**: 23 commands, 5 agents, and 6 domain skills across 5 core plugins.
 
 ### Design Goals
 
@@ -34,13 +36,13 @@ Claude Code Plugins extends Anthropic's Claude Code with structured development 
 ### Component Structure
 
 ```
-claude-agent-framework/
-├── plugins/                # Core plugin system
-│   ├── system/            # System configuration (4 commands)
+claude-code-toolkit/
+├── plugins/                # Core plugins (5 plugins, 23 commands)
+│   ├── system/            # System configuration (3 commands, 2 agents)
 │   ├── workflow/          # Development workflow (6 commands)
-│   ├── development/       # Code operations (6 commands)
-│   ├── agents/            # Agent invocation (2 commands)
-│   └── memory/            # Context management (7 commands)
+│   ├── development/       # Code operations (7 commands, 3 agents)
+│   ├── transition/        # Session boundaries (2 commands)
+│   └── memory/            # Knowledge persistence (5 commands)
 ├── skills/                # Domain skills (6 skills)
 │   ├── ml-ai/             # ML/AI skills
 │   │   ├── rag-implementation/
@@ -50,9 +52,8 @@ claude-agent-framework/
 │       ├── docker-optimization/
 │       ├── sql-optimization/
 │       └── api-authentication/
-├── hooks/                 # Proactive monitoring (2 hooks)
-│   ├── ai-cost-guard.sh
-│   └── gpu-memory-guard.sh
+├── hooks/                 # Example hooks (1 hook)
+│   └── ruff-check-hook.sh       # Lint Python code
 └── docs/                  # Documentation
     ├── mcp-setup.md       # MCP server integration guide
     └── [additional docs]
@@ -108,20 +109,20 @@ All commands are **stateless markdown files** that execute in the project direct
 - **Git 2.0+**
 - **jq** (JSON processing)
 - **Node.js v20+ or v22+** (for MCP servers, optional)
+- **mdtoken** (for contributors - `pip install mdtoken`)
 
-### Quick Install
+### Quick Start
 
 ```bash
 # Clone repository
-git clone https://github.com/[your-org]/claude-agent-framework.git
-cd claude-agent-framework
+git clone https://github.com/appliedaiconsulting/claude-code-toolkit.git
+cd claude-code-toolkit
 
-# Install plugins to Claude Code
-./scripts/install.sh
-
-# Verify installation
+# Start Claude Code
 claude
-# Then type: /system:status
+
+# In Claude Code, run:
+/setup-project
 ```
 
 ### Manual Configuration
@@ -134,7 +135,7 @@ Add to project's `.claude/settings.json`:
     "local": {
       "source": {
         "source": "directory",
-        "path": "/path/to/claude-agent-framework/plugins"
+        "path": "/path/to/claude-code-toolkit/plugins"
       }
     }
   },
@@ -142,7 +143,7 @@ Add to project's `.claude/settings.json`:
     "system@local": true,
     "workflow@local": true,
     "development@local": true,
-    "agents@local": true,
+    "transition@local": true,
     "memory@local": true
   }
 }
@@ -231,34 +232,41 @@ The framework follows an `explore` → `plan` → `next` → `ship` pattern:
 - `/development:git` - Git operations (commit, PR, issues)
 - `/development:docs` - Documentation operations
 
-**Agent Commands**:
-- `/agents:agent <name> "task"` - Invoke specialized agent
-- `/agents:serena` - Activate Serena semantic code understanding
+**Transition Commands**:
+- `/transition:handoff` - Create session handoff with context analysis
+- `/transition:continue` - Resume from previous session handoff
 
 **Memory Commands**:
 - `/memory:index` - Create persistent project understanding
+- `/memory:memory-update` - Update memory with new insights
 - `/memory:memory-review` - Display current memory state
 - `/memory:memory-gc` - Garbage collect stale entries
 - `/memory:performance` - View token usage and metrics
 
+**Note**: For semantic code understanding, use Serena MCP directly. See [docs/mcp-setup.md](docs/mcp-setup.md) for configuration.
+
 ### Specialized Agents
 
+The framework includes 5 specialized agents that Claude Code can invoke via its native Task tool. Simply ask Claude to use an agent by name:
+
 **Available Agents**:
-- `architect` - System design and architectural decisions
-- `test-engineer` - Test creation and coverage analysis
-- `code-reviewer` - Code quality and security audit
 
-**Usage**:
-```bash
-# Invoke architect agent for design decisions
-/agents:agent architect "Design authentication system architecture"
+| Agent | Location | Purpose |
+|-------|----------|---------|
+| `architect` | development | System design and architectural decisions |
+| `test-engineer` | development | Test creation and coverage analysis |
+| `code-reviewer` | development | Code quality and security audit |
+| `auditor` | system | Infrastructure verification and compliance |
+| `reasoning-specialist` | system | Complex analysis with structured reasoning |
 
-# Use test-engineer for TDD workflow
-/development:test tdd
-
-# Perform systematic code review
-/development:review src/ --systematic
+**Usage** - just ask Claude directly:
 ```
+"Use the architect agent to design the authentication system"
+"Have the code-reviewer agent review this PR"
+"Use the test-engineer agent to create tests for the user service"
+```
+
+Claude Code's Task tool will invoke the appropriate agent. No wrapper commands needed.
 
 ### Domain Skills (6 Skills)
 
@@ -331,13 +339,41 @@ Skills activate automatically when your query matches their domain:
 - Before/after examples showing measurable improvements
 - Works with progressive disclosure for optimal token efficiency
 
-### Proactive Hooks
+### Example Hook
 
-**Automated Monitoring**:
-- `ai-cost-guard.sh` - Alerts when AI API costs exceed thresholds
-- `gpu-memory-guard.sh` - Prevents GPU OOM errors
+The framework includes an example hook demonstrating the Claude Code hooks system:
 
-**Hooks run automatically** during relevant operations, no manual invocation required.
+#### Code Quality (`ruff-check-hook.sh`)
+- Lints Python code for quality issues
+- Catches unused imports, undefined names, syntax errors
+- Claude sees the lint output and can act on it immediately
+- **Demo**: Write code with unused import, see immediate linting feedback
+
+**Why this hook is useful**: Unlike auto-formatting hooks (where Claude doesn't see the result), linting hooks provide actionable feedback that Claude can respond to in the same session.
+
+**Installation**:
+```bash
+# Copy hook to ~/.claude/hooks/
+mkdir -p ~/.claude/hooks
+cp hooks/ruff-check-hook.sh ~/.claude/hooks/
+chmod +x ~/.claude/hooks/ruff-check-hook.sh
+
+# Configure in project's .claude/settings.json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {"type": "command", "command": "~/.claude/hooks/ruff-check-hook.sh"}
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Creating Your Own Hooks**: See [hooks/README.md](hooks/README.md) for the hook data format and design tips
 
 ---
 
@@ -468,7 +504,7 @@ Configure in `.claude/settings.json`:
     "system@local": true,
     "workflow@local": true,
     "development@local": true,
-    "agents@local": true,
+    "transition@local": true,
     "memory@local": true
   },
   "mcpServers": {
@@ -511,7 +547,7 @@ Global user settings in `~/.claude/CLAUDE.md`:
 
 ### Getting Started
 
-- **[5-Minute Demo](demo.claw.md)** - Quick-start demonstration
+- **[5-Minute Demo](docs/tutorials/demo-guide.md)** - Quick-start demonstration
 - **[MCP Setup Guide](docs/mcp-setup.md)** - MCP server integration
 
 ### Plugin Documentation
@@ -521,7 +557,7 @@ Each plugin has detailed README:
 - [system plugin](plugins/system/README.md) - System utilities
 - [workflow plugin](plugins/workflow/README.md) - Development workflow
 - [development plugin](plugins/development/README.md) - Code operations
-- [agents plugin](plugins/agents/README.md) - Agent invocation
+- [transition plugin](plugins/transition/README.md) - Session boundaries
 - [memory plugin](plugins/memory/README.md) - Context management
 
 ### Architecture Documentation
@@ -565,17 +601,15 @@ my-plugin/
 }
 ```
 
-### Testing
+### Development Setup
 
 ```bash
-# Run plugin tests
-npm test
+# Install pre-commit hooks (requires mdtoken)
+pip install mdtoken pre-commit
+pre-commit install
 
-# Run specific test suite
-npm test -- plugins/workflow
-
-# Run with coverage
-npm run test:coverage
+# mdtoken enforces token limits on markdown files
+# This keeps plugin commands concise and context-efficient
 ```
 
 ### Contributing
@@ -644,10 +678,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 **Q: Serena not activating**
 
-**A**: Serena requires per-project setup:
-```bash
-cd /path/to/project
-/agents:serena  # Activates Serena for this project
+**A**: Serena MCP requires per-project setup. See [docs/mcp-setup.md](docs/mcp-setup.md) for configuration. Use Serena tools directly:
+```
+mcp__serena__activate_project()
+mcp__serena__find_symbol()
 ```
 
 **Q: Tasks not executing**
@@ -662,7 +696,7 @@ cd /path/to/project
 - **Documentation**: Check plugin README files for detailed command usage
 - **System Health**: Run `/system:status` to verify framework setup
 - **Compliance**: Run `/system:audit` to check for issues
-- **GitHub Issues**: https://github.com/[your-org]/claude-agent-framework/issues
+- **GitHub Issues**: https://github.com/appliedaiconsulting/claude-code-toolkit/issues
 
 ---
 
@@ -706,4 +740,4 @@ Framework developed through 6+ months of production use across book authoring, q
 - **Claude Code Documentation**: https://docs.claude.com/claude-code
 - **MCP Specification**: https://modelcontextprotocol.io
 - **Plugin Development**: See plugin README files for examples
-- **GitHub Repository**: https://github.com/[your-org]/claude-agent-framework
+- **GitHub Repository**: https://github.com/appliedaiconsulting/claude-code-toolkit

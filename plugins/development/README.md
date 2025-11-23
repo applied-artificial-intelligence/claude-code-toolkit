@@ -468,9 +468,8 @@ When Serena MCP is available:
 - **Speed**: Faster code navigation and search
 
 **Enable Serena**:
-```bash
-/serena  # From core plugin
-```
+
+Serena is enabled via MCP configuration (not a wrapper command). See [docs/mcp-setup.md](../../docs/mcp-setup.md) for setup instructions.
 
 ### Sequential Thinking
 When Sequential Thinking is available:

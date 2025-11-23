@@ -1,0 +1,37 @@
+# mdtoken configuration for Claude Code Toolkit
+# Prevents unbounded growth of plugin markdown files
+
+model: "claude-3.5"
+default_limit: 3500
+fail_on_exceed: true
+
+limits:
+  # Main README - allow larger for comprehensive docs
+  "README.md": 15000
+
+  # Tutorials - detailed guides
+  "docs/tutorials/": 5000
+
+  # Plugin commands - keep concise (substring match)
+  "commands/": 5500
+
+  # Plugin agents - moderate size
+  "agents/": 4000
+
+  # Plugin skills - can be detailed
+  "skills/": 7000
+
+  # Hooks documentation
+  "hooks/README.md": 3000
+
+  # Docs directory - reference material (substring match)
+  "docs/": 6500
+
+exclude:
+  - "node_modules/**"
+  - "venv/**"
+  - ".git/**"
+  - ".archive/**"  # Historical/archived content
+  - ".repomix*/**"  # Generated packages
+
+total_limit: 250000  # Aggregate limit for OSS distribution
