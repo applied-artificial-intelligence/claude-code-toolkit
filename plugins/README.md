@@ -30,8 +30,9 @@ Add to any project's `.claude/settings.json`:
     "setup@local": true,
     "system@local": true,
     "workflow@local": true,
-    "memory@local": true,
-    "development@local": true
+    "development@local": true,
+    "transition@local": true,
+    "memory@local": true
   }
 }
 ```
@@ -368,6 +369,8 @@ Different projects enable different plugin combinations:
   "enabledPlugins": {
     "system@local": true,
     "workflow@local": true,
+    "development@local": true,
+    "transition@local": true,
     "memory@local": true,
     "ml3t-researcher@local": true,
     "ml3t-coauthor@local": true,
@@ -383,6 +386,7 @@ Different projects enable different plugin combinations:
     "system@local": true,
     "workflow@local": true,
     "development@local": true,
+    "transition@local": true,
     "memory@local": true,
     "quant@local": true
   }
@@ -397,6 +401,7 @@ Different projects enable different plugin combinations:
     "system@local": true,
     "workflow@local": true,
     "development@local": true,
+    "transition@local": true,
     "memory@local": true,
     "web-development@local": true
   }
@@ -409,6 +414,8 @@ Different projects enable different plugin combinations:
   "enabledPlugins": {
     "system@local": true,
     "workflow@local": true,
+    "development@local": true,
+    "transition@local": true,
     "memory@local": true,
     "content-marketing@local": true,
     "writing-skills@local": true

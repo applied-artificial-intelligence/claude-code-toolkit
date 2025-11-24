@@ -547,7 +547,7 @@ Global user settings in `~/.claude/CLAUDE.md`:
 
 ### Getting Started
 
-- **[5-Minute Demo](docs/tutorials/demo-guide.md)** - Quick-start demonstration
+- **[5-Minute Demo](docs/demo-guide.md)** - Quick-start demonstration
 - **[MCP Setup Guide](docs/mcp-setup.md)** - MCP server integration
 
 ### Plugin Documentation
@@ -667,7 +667,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
   "enabledPlugins": {
     "system@local": true,
     "workflow@local": true,
-    "development@local": true
+    "development@local": true,
+    "transition@local": true,
+    "memory@local": true
   }
 }
 ```

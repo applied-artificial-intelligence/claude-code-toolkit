@@ -171,8 +171,8 @@ In 5 minutes, you've seen how to:
 ### Learn More
 
 - [Installation Guide](../getting-started/installation.md)
-- [MCP Setup](../mcp-setup.md)
-- [Plugin Reference](../../plugins/README.md)
+- [MCP Setup](mcp-setup.md)
+- [Plugin Reference](../plugins/README.md)
 
 ---
 
@@ -186,13 +186,15 @@ Ensure plugins are enabled in `.claude/settings.json`:
   "enabledPlugins": {
     "system@local": true,
     "workflow@local": true,
-    "development@local": true
+    "development@local": true,
+    "transition@local": true,
+    "memory@local": true
   }
 }
 ```
 
 **Q: MCP tools not working**
-MCP tools are optional. Commands work without them but with reduced features. See [MCP Setup](../mcp-setup.md).
+MCP tools are optional. Commands work without them but with reduced features. See [MCP Setup](mcp-setup.md).
 
 ---
 
