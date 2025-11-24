@@ -270,9 +270,9 @@ continue from .claude/transitions/2025-11-15/223452.md
 # Consolidates: Documentation into proper structure
 ```
 
-**`/status [verbose]`** - Current project and task status
+**`/system:status [verbose]`** - Current project and task status
 ```bash
-/status
+/system:status
 # Shows: Active work unit, task progress, git status, memory usage
 ```
 

@@ -358,7 +358,7 @@ fi
 After planning completion:
 1. **Review the plan**: Verify it meets requirements and expectations
 2. **Begin implementation**: Run `/next` to start first available task
-3. **Track progress**: Use `/status` to monitor task completion
+3. **Track progress**: Use `/system:status` to monitor task completion
 4. **Adapt as needed**: Adjust plan based on implementation discoveries
 
 ### Performance Insights for Future Planning

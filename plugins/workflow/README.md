@@ -305,7 +305,7 @@ Time-boxed exploration in isolated branch for investigating uncertain approaches
 ## Integration with Other Plugins
 
 ### System Plugin
-- Uses `/status` to show plan progress
+- Uses `/system:status` to show plan progress
 - Uses `/setup` for project initialization
 - Uses `/audit` for framework compliance
 
@@ -477,7 +477,7 @@ The workflow tracks:
 
 View with:
 ```bash
-/status verbose
+/system:status verbose
 /performance
 ```
 

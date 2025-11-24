@@ -1,11 +1,11 @@
 ---
-name: status
+name: system:status
 description: Unified view of work, system, and memory state
 allowed-tools: [Read, Bash, Glob]
 argument-hint: "[verbose]"
 ---
 
-# Status Command
+# System Status Command
 
 I'll show you a comprehensive view of your current work state, system status, and memory usage.
 

@@ -342,7 +342,7 @@ Code review, documentation quality, and security audit specialist.
 
 ### Core Plugin
 - Uses `/agent` for invoking development agents
-- Uses `/status` to show analysis and review progress
+- Uses `/system:status` to show analysis and review progress
 - Uses `/performance` for execution metrics
 
 ### Workflow Plugin
@@ -510,7 +510,7 @@ The development plugin tracks:
 
 View with:
 ```bash
-/status verbose
+/system:status verbose
 /performance
 ```
 

@@ -10,7 +10,7 @@ The System plugin provides essential commands for configuring, monitoring, and m
 
 ## Commands (9)
 
-### /status
+### /system:status
 **Purpose**: Unified view of work, system, and memory state
 
 Provides comprehensive status overview including:
@@ -21,8 +21,8 @@ Provides comprehensive status overview including:
 
 **Usage**:
 ```bash
-/status              # Standard status view
-/status verbose      # Detailed status with full context
+/system:status              # Standard status view
+/system:status verbose      # Detailed status with full context
 ```
 
 ### /config
@@ -155,11 +155,11 @@ Intelligent cleanup operations:
 ## Integration
 
 ### Memory System
-- `status` command integrates with memory to show context state
+- `system:status` command integrates with memory to show context state
 - `audit` validates memory structure and health
 
 ### Work Units
-- `status` shows active work unit progress
+- `system:status` shows active work unit progress
 - `audit` validates work unit integrity
 - `cleanup` can archive completed work units
 
@@ -171,9 +171,9 @@ Intelligent cleanup operations:
 
 ### Daily Workflow
 ```bash
-/status                  # Check what's happening
+/system:status                  # Check what's happening
 # ... do work ...
-/status verbose          # Review progress before handoff
+/system:status verbose          # Review progress before handoff
 ```
 
 ### Project Initialization
@@ -201,7 +201,7 @@ Intelligent cleanup operations:
 ## Best Practices
 
 ### System Health
-- Run `/status` at session start to understand current state
+- Run `/system:status` at session start to understand current state
 - Run `/audit` periodically to catch configuration drift
 - Use `/cleanup` when projects accumulate clutter
 
@@ -217,16 +217,18 @@ Intelligent cleanup operations:
 - Use `/setup:existing` to add framework to existing projects without disruption
 - Use `/setup:user` once to configure global preferences
 
-## Migration from Core Plugin
+## Migration Notes
 
-These commands moved from the `core` plugin (v0.9.x):
-- `status` - Was `/core/status`
+### From Core Plugin (v0.9.x)
+These commands moved from the `core` plugin:
+- `status` → `/system:status` (renamed to avoid conflict with native /status)
 - `config` - Was `/core/config`
 - `setup` - Was `/core/setup`
 - `audit` - Was `/core/audit`
 - `cleanup` - Was `/core/cleanup`
 
-Command names and behavior unchanged. Only organizational change.
+### Name Change (v1.1.0)
+- `/status` → `/system:status` to avoid conflict with Claude Code native `/status` command
 
 ## Dependencies
 

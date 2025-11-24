@@ -1,6 +1,6 @@
 {
   "name": "system",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "System health and maintenance",
   "author": {
     "name": "Claude Code Framework"
@@ -9,7 +9,7 @@
   "commands": [
     "./commands/audit.md",
     "./commands/cleanup.md",
-    "./commands/status.md"
+    "./commands/system:status.md"
   ],
   "agents": [
     "./agents/auditor.md",
