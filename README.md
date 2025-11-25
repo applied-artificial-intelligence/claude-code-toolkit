@@ -26,8 +26,8 @@ A collection of plugins, skills, and patterns developed through 6+ months of dai
 - **Workflow management**: `explore` → `plan` → `next` → `ship` pattern
 - **Memory persistence**: Cross-session context with automatic reflection
 - **Quality automation**: Git safety, pre/post hooks, compliance auditing
-- **Code intelligence**: Semantic code understanding (Serena MCP), 70-90% token reduction
-- **Domain expertise**: 6 skills across ML/AI and general development with measurable improvements
+- **MCP integration**: Optional tools (Serena, Sequential Thinking) with graceful degradation
+- **Domain adaptation**: Examples showing how to extend Claude Code beyond software (quant, writing)
 
 ---
 
@@ -191,6 +191,10 @@ claude-code-toolkit/
 │   ├── development/       # Code operations (7 commands, 3 agents)
 │   ├── system/            # Infrastructure (4 commands, 2 agents)
 │   └── setup/             # Project initialization (5 commands)
+├── examples/              # Domain adaptation examples
+│   └── domain-adaptation/ # How to extend Claude Code beyond software
+│       ├── quant/         # Quantitative finance (3 validators)
+│       └── writing/       # Professional writing (3 skills)
 ├── skills/                # Domain expertise (6 skills)
 │   ├── general-dev/       # Docker, SQL, API auth
 │   ├── rag-implementation/
@@ -232,13 +236,15 @@ All commands are **stateless markdown files** that execute in the project direct
 
 **Supported MCP Servers** (see [docs/mcp-setup.md](docs/mcp-setup.md)):
 
-| MCP Server | Impact | Token Change | Status |
-|------------|--------|--------------|--------|
-| Sequential Thinking | Structured reasoning | +15-30% | Built-in (no setup) |
-| Serena | Semantic code understanding | -70-90% | Optional (per-project) |
-| Context7 | Documentation access | -50% | Optional (API key) |
-| Chrome DevTools | Browser automation | Varies | Optional |
-| FireCrawl | Web research | -40% | Optional (API key) |
+| MCP Server | Purpose | Status |
+|------------|---------|--------|
+| Sequential Thinking | Structured reasoning for complex analysis | Built-in (no setup) |
+| Serena | Semantic code understanding | Optional (per-project) |
+| Context7 | Documentation access | Optional (API key) |
+| Chrome DevTools | Browser automation | Optional |
+| FireCrawl | Web research | Optional (API key) |
+
+**Note**: MCP tools have trade-offs. Serena helps with code operations but requires indexing overhead. Token efficiency varies by task and we haven't rigorously benchmarked specific percentages.
 
 **Commands auto-detect MCP availability** and fall back to standard operations when unavailable.
 
@@ -522,8 +528,42 @@ Skills activate automatically when your query matches their domain:
 **Benefits**:
 - Load knowledge only when needed (no context pollution)
 - 10-20KB of focused expertise per skill
-- Before/after examples showing measurable improvements
 - Works with progressive disclosure for optimal token efficiency
+
+---
+
+### Domain Adaptation Examples
+
+**Claude Code isn't just for software.** The `examples/domain-adaptation/` directory shows how to extend Claude Code to other domains.
+
+**The Knowledge Encoding Problem**: When adapting to a new domain, where do you put domain knowledge?
+
+| Level | What Goes Here | Example |
+|-------|---------------|---------|
+| Agent Definition | General awareness | "Look-ahead bias is a problem" |
+| Skills/Validators | Specific checkpoints | "Check: `scaler.fit(X)` BEFORE `train_test_split`" |
+| Commands | Workflow steps | `explore` → `plan` → `next` → `ship` |
+
+**The insight**: General awareness isn't enough. You need specific, actionable checkpoints.
+
+**Included Examples**:
+
+**Quantitative Finance** (`examples/domain-adaptation/quant/`)
+- 3 validators with 21 specific patterns
+- `quant-ml-validator`: Look-ahead bias, survivorship bias, wrong CV
+- `quant-backtest-validator`: Missing costs, unrealistic fills
+- `quant-risk-validator`: No kill switch, unlimited leverage
+- Each pattern: detection regex + quantified impact + specific fix
+
+**Professional Writing** (`examples/domain-adaptation/writing/`)
+- 3 framework skills
+- `pyramid-principle`: Barbara Minto's answer-first structure
+- `scqa-framework`: Situation-Complication-Question-Answer narrative
+- `plain-language`: Federal plain language guidelines
+
+See [examples/domain-adaptation/README.md](examples/domain-adaptation/README.md) for full documentation.
+
+---
 
 ### Example Hook
 
@@ -679,9 +719,7 @@ chmod +x ~/.claude/hooks/ruff-check-hook.sh
 2. **Task Analysis**: Load relevant commands/agents (~10KB)
 3. **Execution**: Load detailed patterns only when needed (~5KB)
 
-**Result**: 70%+ token savings vs. loading all documentation upfront.
-
-**With Serena MCP**: Additional 70-90% reduction for code operations.
+**Philosophy**: Load context incrementally rather than all at once. Actual savings vary by task.
 
 ### Quality Gates
 
@@ -849,17 +887,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## Performance
 
-### Benchmarks
+### Time to First Value
 
-**Token Usage** (typical feature development):
-- Without MCP: ~150K tokens
-- With Serena: ~30K tokens (80% reduction)
-- With Sequential Thinking: ~180K tokens (+20%, higher quality)
-
-**Time to First Value**:
 - Project setup: <2 minutes
 - First workflow execution: <5 minutes
-- MCP server setup: <15 minutes
+- MCP server setup: <15 minutes (optional)
+
+**Note**: Token efficiency varies by task. MCP tools like Serena can help with code operations but have their own overhead (indexing). We haven't rigorously benchmarked specific percentages.
 
 ### Optimization Tips
 
