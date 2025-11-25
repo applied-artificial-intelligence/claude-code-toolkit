@@ -108,6 +108,23 @@ The toolkit is organized into **six namespaces**, each implementing a distinct A
 
 ## 3. Interesting Angles (Ranked)
 
+### Angle 0: "Reality Check: What Customization Cannot Fix" (MUST-LEAD)
+
+**Finding**: Claude's behavior = instruction training (immutable) + customization (limited). Toolkit works *within* constraints.
+
+**Unavoidable Behaviors**:
+- **Sycophancy**: "You're absolutely right!" even with anti-sycophancy protocols (we tried, they failed)
+- **Completion Bias**: Proceeds without full specs. Trained to deliver, not question.
+- **Action Over Reflection**: Tunnel vision on declared goals. Big picture requires deliberate prompting.
+
+**Bottom Line**: Inspection non-negotiable. Claude IS powerful—but limitations exist that you'll encounter repeatedly.
+
+**Content Angle**: "What Claude Code Customization Can (and Can't) Fix"
+
+**Why Lead With This**: Sets honest expectations. Establishes credibility. Everything else is "given these constraints, here's what works."
+
+---
+
 ### Angle 1: "Co-Evolution Through Shared Pain Points"
 
 **Finding**: The toolkit evolved facing the same pain points Anthropic addresses in their documentation. It's no surprise solutions align—we're solving the same problems.
@@ -281,32 +298,27 @@ Each pattern includes:
 
 ## 5. Limitations & Caveats
 
-**Learning Curve**: 2-4 weeks to productivity, 30-60 min setup per project
+### Model-Level (See Angle 0)
+Sycophancy, completion bias, action over reflection—baked into instruction training. **Always inspect work.**
 
-**Framework Constraints**: Stateless, terminal-only, no background monitoring, context limits require management
+### Framework Constraints
+Stateless, terminal-only, context limits (~85% actual when Claude reports 70%), no external dependencies.
 
-**When It Doesn't Help**: One-off simple tasks, real-time systems, GUI applications
-
-**ROI Reality**: 2-5x productivity gain **for systematic users when discipline maintained**
+### Practical
+- **Learning Curve**: 2-4 weeks to productivity
+- **When It Doesn't Help**: One-off tasks, real-time systems, GUIs
+- **ROI**: 2-5x gain **with discipline maintained**—without inspection discipline, completion bias leads to errors
 
 ---
 
 ## 6. Cross-Project Connections
 
-**Shared with Enterprise Agents**:
-- **Theme**: Systematic approach reveals what actually works
-  - Claude Code Toolkit: "Patterns co-evolve with Anthropic docs"
-  - Enterprise Agents: "Rules handle 72% of volume"
-- **Methodology**: Both projects emphasize evidence over assumptions
+**Shared Theme**: Evidence-based, honest about limitations
+- **Enterprise Agents**: Rules handle 72% of volume (measured)
+- **PDFBench**: 91-point domain gap (measured)
+- **This Toolkit**: Patterns documented, limitations acknowledged
 
-**Shared with PDFBench**:
-- **Theme**: Honest assessment over marketing claims
-  - Claude Code Toolkit: Patterns documented, metrics awaited
-  - PDFBench: "91-point domain gap" (actual measurement)
-
-**Content Angle**: "How Applied AI Approaches Tooling"
-- All three projects: Evidence-based, honest about limitations
-- Positions Applied AI as practitioners who show their work
+**Content Angle**: "How Applied AI Approaches Tooling"—practitioners who show their work
 
 ---
 
@@ -323,32 +335,17 @@ Each pattern includes:
 
 ---
 
-## 8. Recommended Next Steps for Content Hub
+## 8. Recommended Next Steps
 
-**Immediate**:
-1. Draft pillar post: "6 Months with Claude Code: What Actually Works"
-2. Update service page: Reference toolkit as proof of AI tooling expertise
-3. Link from Claude Code Toolkit README to Applied AI website
+**Immediate**: Pillar post ("6 Months with Claude Code"), update service page, link from README
 
-**Post-Launch**:
-4. Blog series (6 posts based on angles above):
-   - "We Used Claude Code for 6 Months. Here's What Actually Works."
-   - **"Claude Code Isn't Just for Software: Adapting Workflows to Your Domain"** (KEY DIFFERENTIATOR)
-   - "Why Your Claude Code Session Quality Drops (And How to Fix It)"
-   - "A Systematic Approach to Verification in AI-Assisted Writing"
-   - "Building Claude Code Skills That Actually Help"
-   - "Organizing Your Claude Code Toolkit: Six Namespaces for Complete Coverage"
+**Blog Series** (priority order):
+1. "What Claude Code Customization Can (and Can't) Fix" ← **LEAD WITH THIS**
+2. "Claude Code Isn't Just for Software" (domain adaptation) ← KEY DIFFERENTIATOR
+3. "Why Your Session Quality Drops"
+4. "Six Namespaces: Complete Coverage"
 
-5. Technical deep-dives:
-   - "The Explore-Plan-Next-Ship Workflow Explained"
-   - "Context Window Management for Long Sessions"
-   - **"Domain Adaptation: From Software to Writing to Quant Research"** (NEW)
-   - "Six Namespaces: Implementing Anthropic's Agent Architecture"
-
-**GitHub-Specific**:
-6. Ensure README serves as effective landing page (currently comprehensive)
-7. Add screenshots/demos showing workflow in action
-8. Consider video walkthrough for 5-minute demo
+**GitHub**: Screenshots/demos, video walkthrough
 
 ---
 

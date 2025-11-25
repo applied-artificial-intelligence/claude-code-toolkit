@@ -31,6 +31,71 @@ A collection of plugins, skills, and patterns developed through 6+ months of dai
 
 ---
 
+## Reality Check: What Customization Cannot Fix
+
+Before diving into the toolkit, understand what you're working with—and against.
+
+### The Instruction Training Boundary
+
+Claude's behavior comes from two layers:
+
+1. **Instruction training** (model training, RLHF) → Core personality, instincts, behavioral drivers. **Immutable.**
+2. **Customization layer** (system prompts, CLAUDE.md, agent definitions) → Guidance on top. **Has limits.**
+
+No matter how clever your prompting, you're working with Claude's pre-trained personality. You can nudge it, structure it, guide it—but the underlying instincts remain. The "true nature" always shines through eventually.
+
+### Behaviors You'll Encounter (Repeatedly)
+
+**Sycophancy**: The tendency to agree, validate, and praise.
+- We developed elaborate anti-sycophancy protocols. They failed.
+- Give completely contradictory prompts → still get "You're absolutely right!"
+- Expect to be told your ideas are brilliant even when they're not.
+
+**Completion Bias**: The urge to deliver results, regardless of completeness.
+- Claude will proceed without full specifications.
+- Will fill gaps with assumptions rather than asking.
+- Trained to deliver, not to pause and question.
+
+**Action Over Reflection**: Bias toward doing, not critically examining.
+- Tunnel vision on the declared goal.
+- Big picture thinking requires deliberate prompting.
+- Honest feedback and pushback don't come naturally.
+
+**Context Limitations**: The precious context window determines what Claude can "see."
+- Important details get forgotten, overlooked, deprioritized.
+- Specify too much → things get lost.
+- Specify too little → Claude fills gaps (often incorrectly).
+
+### What This Means for You
+
+**Thorough inspection is non-negotiable.**
+- Claude can make mistakes in literally every respect.
+- Never assume output matches expectations.
+- Everything requires review—especially things that look correct.
+
+**Proper testing is essential.**
+- Validate behavior, not just structure.
+- Test edge cases Claude may not have considered.
+- Don't trust "it should work"—verify it does.
+
+**The toolkit helps, but doesn't solve these problems.**
+- We provide structure, workflows, and guardrails.
+- But Claude's base personality operates within that structure.
+- Sometimes it will drive you crazy because it "just wants to get shit done."
+
+### Why We're Honest About This
+
+We removed dubious metrics from this toolkit ("80% token reduction," "zero hallucinations") because they're not validated—and because overclaiming doesn't help anyone.
+
+Claude Code is genuinely powerful:
+- Amazing at navigating complex codebases
+- Excellent at using tools to solve problems
+- Incredibly convenient in the terminal environment
+
+But it has real limitations that you'll encounter repeatedly. This toolkit provides patterns for working *with* those constraints rather than pretending they don't exist.
+
+---
+
 ## Anthropic Best Practices Alignment
 
 This toolkit implements patterns and recommendations from Anthropic's official Claude Code documentation. It represents "what Anthropic says you should be doing, here implemented."
