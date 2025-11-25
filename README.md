@@ -338,7 +338,7 @@ All commands are **stateless markdown files** that execute in the project direct
 
 ```bash
 # Clone repository
-git clone https://github.com/appliedaiconsulting/claude-code-toolkit.git
+git clone https://github.com/applied-artificial-intelligence/claude-code-toolkit.git
 cd claude-code-toolkit
 
 # Install the setup command globally (one-time)
@@ -1032,7 +1032,7 @@ mcp__serena__find_symbol()
 - **Documentation**: Check plugin README files for detailed command usage
 - **System Health**: Run `/system:status` to verify framework setup
 - **Compliance**: Run `/system:audit` to check for issues
-- **GitHub Issues**: https://github.com/appliedaiconsulting/claude-code-toolkit/issues
+- **GitHub Issues**: https://github.com/applied-artificial-intelligence/claude-code-toolkit/issues
 
 ---
 
@@ -1089,4 +1089,4 @@ Framework developed through 6+ months of production use across book authoring, q
 
 - **MCP Specification**: https://modelcontextprotocol.io
 - **Plugin Development**: See plugin README files for examples
-- **GitHub Repository**: https://github.com/appliedaiconsulting/claude-code-toolkit
+- **GitHub Repository**: https://github.com/applied-artificial-intelligence/claude-code-toolkit
