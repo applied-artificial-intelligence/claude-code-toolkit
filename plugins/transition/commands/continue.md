@@ -25,6 +25,22 @@ This command automates the continuation workflow after `/clear` by:
 
 ## What It Does
 
+### Step 0: Check Memory First (Anthropic Best Practice)
+**ALWAYS check memory directory before doing anything else.** This follows Anthropic's Memory Tool recommendation to review persistent context at session start.
+
+```bash
+# Check if memory directory exists and has content
+if [ -d ".claude/memory" ] && [ -n "$(ls -A .claude/memory 2>/dev/null)" ]; then
+    echo "📚 Memory directory found - reviewing project context..."
+    ls -la .claude/memory/
+fi
+```
+
+Read key memory files to restore project context:
+- `.claude/memory/project-context.md` - Project knowledge and architecture
+- `.claude/memory/lessons-learned.md` - Accumulated insights
+- `.claude/memory/project_state.md` - Current project state (if exists)
+
 ### Step 1: Locate Latest Handoff
 Dynamically finds the most recent transition using:
 
