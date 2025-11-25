@@ -506,15 +506,28 @@ chmod +x ~/.claude/hooks/ruff-check-hook.sh
 
 ---
 
-## Screenshots
+## Workflow Examples
 
 ### Context Management: /handoff → /continue
 
-Managing context across sessions to prevent quality degradation:
+**Scenario**: Managing context across sessions to prevent quality degradation.
 
-![Handoff and Continue Workflow](screenshots/01_handoff_continue.png)
+```bash
+# At 70% perceived context usage (~85% actual)
+/handoff
 
-**Key features shown**:
+# Creates .claude/transitions/2025-11-25/143052.md with:
+# - Session focus and active work state
+# - Recent decisions and outstanding items
+# - Todo list state and next steps
+
+# After /clear, resume seamlessly:
+/continue
+
+# Automatically loads latest handoff, restores context
+```
+
+**Key features**:
 - Context analysis at 70% perceived usage (~85% actual)
 - Active work state preservation
 - Recent decisions and outstanding items
@@ -524,11 +537,27 @@ Managing context across sessions to prevent quality degradation:
 
 ### Complete Workflow: /explore → /plan → /next
 
-Systematic task execution from requirements to implementation:
+**Scenario**: Systematic task execution from requirements to implementation.
 
-![Workflow Sequence](screenshots/02_workflow_sequence.png)
+```bash
+# 1. Analyze requirements
+/workflow:explore "add user authentication with JWT"
+# Creates work unit, analyzes codebase, identifies dependencies
 
-**Key features shown**:
+# 2. Create implementation plan
+/workflow:plan
+# Generates task breakdown with dependencies in state.json
+
+# 3. Execute tasks sequentially
+/workflow:next
+# Executes next available task, auto-commits on completion
+
+# 4. Deliver completed work
+/workflow:ship
+# Validates quality gates, creates PR if configured
+```
+
+**Key features**:
 - Requirements analysis with `/explore`
 - Task breakdown with `/plan`
 - Incremental execution with `/next`
@@ -538,11 +567,19 @@ Systematic task execution from requirements to implementation:
 
 ### Code Analysis: /analyze and /review
 
-Deep codebase understanding and quality checks:
+**Scenario**: Deep codebase understanding and quality checks.
 
-![Code Analysis and Review](screenshots/03_analyze_review.png)
+```bash
+# Analyze project structure
+/development:analyze
+# Produces structural analysis, identifies patterns, documents architecture
 
-**Key features shown**:
+# Review code quality
+/development:review src/auth/
+# Checks code quality, security, and provides actionable recommendations
+```
+
+**Key features**:
 - Structural analysis with pattern identification
 - Test coverage metrics
 - Code quality review with actionable recommendations

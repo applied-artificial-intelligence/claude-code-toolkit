@@ -80,3 +80,18 @@ secrets/
 
 # Archived development artifacts
 .archive/
+
+# Screenshots and media (keep local, don't publish)
+screenshots/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.mov
+*.avi
+*.webm
+*.webp
+
+# Ruff cache
+.ruff_cache/
