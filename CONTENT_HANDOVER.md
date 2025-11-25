@@ -16,6 +16,7 @@
 - **Commands**: 28 total across plugins
 - **Agents**: 5 specialized (architect, test-engineer, code-reviewer, auditor, reasoning-specialist)
 - **Skills**: 6 domain skills (3 ML/AI, 3 general development)
+- **Domain adaptation examples**: 2 domains (quant finance, professional writing) with 6 artifacts
 - **Hooks**: 1 example (ruff-check)
 
 ### Design Philosophy
@@ -30,8 +31,9 @@
 
 - **Workflow pattern**: `explore` → `plan` → `next` → `ship`
 - **Context management**: `/handoff` at 70% perceived usage, `/continue` for resumption
-- **Token efficiency**: 70-90% reduction with Serena MCP
+- **MCP integration**: Optional tools (Serena, Sequential Thinking) with graceful degradation
 - **Quality automation**: Git safety, pre/post hooks, compliance auditing
+- **Domain adaptation**: Framework extends beyond software to writing, quant, ML research
 
 ### Six Namespaces (NEW - Aligned with Anthropic Architecture)
 
@@ -72,122 +74,148 @@ The toolkit is organized into **six namespaces**, each implementing a distinct A
 - Agent Skills Engineering Blog
 - Claude Code Subagents docs
 
-### Production Metrics
+### Production Reality
 
-**Token Efficiency**:
-- Without MCP: ~150K tokens (typical feature development)
-- With Serena: ~30K tokens (**80% reduction**)
-- With Sequential Thinking: ~180K tokens (+20%, higher quality)
+**What We've Actually Measured**:
+- Daily use across 6+ months
+- Used for book authoring, plugin development, quantitative research
+- Patterns evolved from real pain points, not theoretical design
+
+**What We Haven't Measured** (be honest):
+- Token efficiency claims require more rigorous benchmarking
+- Serena MCP helps with code operations but has its own overhead (indexing)
+- Time savings vary significantly by task type and user discipline
 
 **Time to First Value**:
 - Project setup: <2 minutes
 - First workflow execution: <5 minutes
-- MCP server setup: <15 minutes
+- MCP server setup: <15 minutes (optional)
 
-### Production Use Cases (Documented)
+### Production Use Cases (In Progress)
 
-**1. ML4T Textbook (25 Chapters, 6 Months)**
-- Literature review time: 2.5 hours vs 8-12 hours manual (**67-75% reduction**)
-- Citation accuracy: 92% with semantic search
+**1. ML4T Textbook (In Progress)**
+- Early chapters using researcher + coauthor plugins
+- Citation pipeline operational (79,957 indexed chunks)
 - Plugins: workflow, ml3t-researcher, ml3t-coauthor, memory
+- *Too early to claim specific efficiency metrics*
 
-**2. Automation Discovery Whitepaper (24,836 Words)**
-- Production time: 40 hours vs 100-120 manual (**60-67% reduction**)
-- **Zero hallucinations in final output** (fact manifest caught issues at checkpoints)
-- All metrics exact (76.4% not "~75%")
-- Plugins: workflow, memory, reports
-
-**3. Plugin Framework Development (This Repo, 6 Months)**
-- 13 plugins shipped
-- Used daily in production across multiple projects
+**2. Plugin Framework Development (This Repo, 6 Months)**
+- 6 core plugins shipped, used daily
+- Framework dogfooded extensively
+- Patterns refined through actual use, not theory
 
 ---
 
 ## 3. Interesting Angles (Ranked)
 
-### Angle 1: "We Didn't Read The Docs First"
+### Angle 1: "Co-Evolution Through Shared Pain Points"
 
-**Finding**: 6+ months of daily use led to patterns that independently converge with Anthropic's official recommendations.
+**Finding**: The toolkit evolved facing the same pain points Anthropic addresses in their documentation. It's no surprise solutions align—we're solving the same problems.
 
 **Evidence**:
 - 7 major patterns match Anthropic documentation
-- Table in README shows convergence point-by-point
-- Citations to official Anthropic docs for each pattern
+- README cites official Anthropic docs for each pattern
+- Patterns emerged from daily use, then validated against docs
 
 **Why It Matters**:
-- Validates the toolkit: These patterns work because they're correct, not because we copied docs
+- Shows what "doing it right" looks like in practice
 - "What Anthropic says you should be doing, here implemented"
-- Independent discovery = stronger proof than "we followed instructions"
+- Co-evolution through shared problems = honest framing
 
 **Content Angle**: "We Used Claude Code for 6 Months. Here's What Actually Works."
 
-### Angle 2: "The 80% Token Reduction"
+### Angle 2: "Domain Adaptation: Claude Beyond Software" (KEY DIFFERENTIATOR)
 
-**Finding**: Serena MCP provides 70-90% token reduction for code operations.
+**Finding**: The framework extends Claude Code beyond software development to writing, quantitative research, and ML workflows—with concrete examples of how to encode domain knowledge.
 
-**Evidence**:
-- Without MCP: ~150K tokens
-- With Serena: ~30K tokens
-- Measured across typical feature development scenarios
+**The Knowledge Encoding Problem**:
+
+When adapting Claude Code to a new domain, where do you put domain knowledge?
+
+| Level | What Goes Here | Example |
+|-------|---------------|---------|
+| **Agent Definition** | General awareness | "Look-ahead bias is a problem. Beware." |
+| **Skills/Validators** | Specific checkpoints | "Check: `scaler.fit(X)` BEFORE `train_test_split`" |
+| **Commands** | Workflow steps | `explore` → `plan` → `next` → `ship` |
+
+**The Insight**: General awareness isn't enough. You need specific, actionable checkpoints.
+
+**Evidence** (now included in `examples/domain-adaptation/`):
+
+**Quant Finance - 3 Validators with 21 specific patterns**:
+- `quant-ml-validator`: 7 look-ahead bias patterns (preprocessing leakage, survivorship bias, wrong CV...)
+- `quant-backtest-validator`: 6 execution realism patterns (missing costs, unrealistic fills...)
+- `quant-risk-validator`: 8 risk control patterns (no kill switch, unlimited leverage...)
+
+Each pattern includes:
+- Detection regex (e.g., `scaler\.fit\(X` before `train_test_split`)
+- Quantified impact (e.g., "5-20% inflation", "2-4% annually")
+- Specific fix with code example
+
+**Writing - 3 Framework Skills**:
+- `pyramid-principle`: Barbara Minto's answer-first hierarchical structure
+- `scqa-framework`: Situation-Complication-Question-Answer narrative
+- `plain-language`: Federal plain language guidelines
 
 **Why It Matters**:
-- Faster sessions (less context = faster responses)
-- More work before context limits hit
-- Lower API costs at scale
-- Better quality (more room for reasoning)
+- Anthropic emphasizes this: internal teams use Claude for marketing, finance, legal
+- Most Claude Code content focuses on software—we show broader applications
+- Same workflow patterns adapt to any domain
+- **We show HOW to encode domain knowledge**, not just that you can
 
-**Content Angle**: "How We Cut Claude Code Token Usage by 80%"
+**Content Angle**: "Claude Code Isn't Just for Software: The Knowledge Encoding Problem"
 
 ### Angle 3: "The 70% Rule for Context"
 
-**Finding**: Handoff at 70% perceived usage (~85% actual) prevents quality degradation.
+**Finding**: Handoff at 70% perceived usage (~85% actual) helps prevent quality degradation.
 
 **Evidence**:
 - Context perception error: Claude reports ~30% lower than actual
-- "64% shown" = "92% actual"
-- Quality degrades before Claude realizes
-- 24,836-word report with zero hallucinations using this discipline
+- Quality tends to degrade before Claude realizes context is limited
+- Proactive handoff discipline observed to help maintain focus
 
 **Why It Matters**:
 - Most users wait too long (until obvious quality issues)
-- By then, hallucinations already in output
 - Proactive handoff = maintained quality
+- `/handoff` + `/continue` pattern makes this systematic
 
 **Content Angle**: "Why Your Claude Code Session Quality Drops (And How to Fix It)"
 
-### Angle 4: "Fact Manifests: How We Got Zero Hallucinations"
+### Angle 4: "Systematic Verification: The Fact Manifest Approach"
 
-**Finding**: Track every quantitative claim to source file and line number. Run section checkpoints every 1,500-2,000 words.
+**Finding**: For long-form content, tracking claims to sources and running checkpoints helps catch issues early.
 
 **Evidence**:
-- 24,836-word report produced
-- Zero hallucinations in final output
-- Caught 1 hallucination during checkpoints before it contaminated output
-- All metrics exact (76.4% not "~75%")
+- Approach used in book authoring workflow
+- Section checkpoints every 1,500-2,000 words (manual process)
+- Fact manifests track claims to source files
 
 **Why It Matters**:
 - Hallucination is the #1 concern with AI-generated content
 - Most approaches: "hope it's accurate"
 - Our approach: Systematic verification with traceable claims
-- Enables publication-quality output
+- *Note: We've started using this approach but don't yet have rigorous metrics on effectiveness*
 
-**Content Angle**: "Zero Hallucinations in 25,000 Words: Our Fact Manifest System"
+**Content Angle**: "A Systematic Approach to Verification in AI-Assisted Writing"
 
 ### Angle 5: "Skills: Progressive Disclosure in Practice"
 
 **Finding**: Skills auto-load only when relevant, following Anthropic's 3-layer disclosure pattern.
 
 **Evidence**:
-- 6 skills with measurable improvements:
-  - Docker: 800MB → 120MB image (85% reduction)
-  - SQL: 3s → 50ms query (60x speedup)
+- 6 domain-specific skills (3 ML/AI, 3 general development)
 - Skills trigger on domain keywords ("Docker", "slow query", "RAG")
-- 10-20KB of focused expertise per skill
+- Progressive loading: catalog (~700 tokens) loads first, content on-demand
 
 **Why It Matters**:
 - No context pollution from irrelevant knowledge
 - Right expertise at the right time
-- Matches how human experts work (context-dependent knowledge)
+- Follows Anthropic's documented skill patterns
+
+**Honest Assessment**:
+- Skills are domain-specific, may not be broadly applicable
+- Other skill libraries exist with more options (e.g., 47 skills on GitHub)
+- Value is in the pattern, not necessarily these specific skills
 
 **Content Angle**: "Building Claude Code Skills That Actually Help"
 
@@ -233,42 +261,33 @@ The toolkit is organized into **six namespaces**, each implementing a distinct A
 
 **Context**: This is production code used daily for 6+ months across multiple domains.
 
-**What We CAN Claim**:
-- Production-tested across book authoring, quant research, web development
-- Measurable efficiency gains (60-75% time reduction in specific tasks)
-- Zero hallucinations achievable with proper discipline
-- Patterns validated against Anthropic's official documentation
+**What We CAN Honestly Claim**:
+- Production-tested across book authoring, quant research, plugin development
+- Patterns evolved from real daily use, not theoretical design
+- Patterns align with Anthropic's official documentation
+- Framework adapts to multiple domains (software, writing, ML research)
+
+**What We CANNOT Claim** (yet):
+- Specific efficiency metrics (not rigorously measured)
+- Token reduction percentages (MCP tools have trade-offs)
+- Zero hallucination guarantees (approach is new, unvalidated)
 
 **Connection to Real Work**:
-- ML4T textbook: 25 chapters, academic citations, code examples
-- Technical reports: 24,836 words, publication quality
-- Plugin framework itself: Dogfooded extensively
+- ML4T textbook: In early stages, using researcher + coauthor plugins
+- Plugin framework itself: Dogfooded extensively over 6 months
+- Domain plugins: quant, writing, research workflows (in active development)
 
 ---
 
 ## 5. Limitations & Caveats
 
-**Be honest about**:
+**Learning Curve**: 2-4 weeks to productivity, 30-60 min setup per project
 
-**Learning Curve**:
-- 2-4 weeks to productivity
-- Setup per project: 30-60 minutes
-- Ongoing discipline: 10-15% overhead (handoffs, checkpoints, verification)
+**Framework Constraints**: Stateless, terminal-only, no background monitoring, context limits require management
 
-**Framework Constraints**:
-- Stateless execution (no persistent connections)
-- No background monitoring
-- Terminal-only (no GUI)
-- Context limits require active management
+**When It Doesn't Help**: One-off simple tasks, real-time systems, GUI applications
 
-**When It Doesn't Help**:
-- One-off simple tasks (overhead not worth it)
-- Real-time systems
-- GUI applications
-
-**ROI Reality**:
-- 2-5x productivity gain **for systematic users when discipline maintained**
-- "Framework doesn't eliminate effort—it channels effort into systematic verification"
+**ROI Reality**: 2-5x productivity gain **for systematic users when discipline maintained**
 
 ---
 
@@ -276,51 +295,29 @@ The toolkit is organized into **six namespaces**, each implementing a distinct A
 
 **Shared with Enterprise Agents**:
 - **Theme**: Systematic approach reveals what actually works
-  - Claude Code Toolkit: "Patterns converge with Anthropic docs"
+  - Claude Code Toolkit: "Patterns co-evolve with Anthropic docs"
   - Enterprise Agents: "Rules handle 72% of volume"
-- **Methodology**: Both projects emphasize measurement over assumptions
+- **Methodology**: Both projects emphasize evidence over assumptions
 
 **Shared with PDFBench**:
-- **Theme**: Benchmarking reveals counterintuitive findings
-  - Claude Code Toolkit: "80% token reduction with MCP"
-  - PDFBench: "91-point domain gap"
+- **Theme**: Honest assessment over marketing claims
+  - Claude Code Toolkit: Patterns documented, metrics awaited
+  - PDFBench: "91-point domain gap" (actual measurement)
 
 **Content Angle**: "How Applied AI Approaches Tooling"
-- All three projects: Systematic evaluation, honest limitations, measurable improvements
-- Positions Applied AI as evidence-based practitioners
+- All three projects: Evidence-based, honest about limitations
+- Positions Applied AI as practitioners who show their work
 
 ---
 
 ## 7. Supporting Files Location
 
-```
-claude-code-toolkit/
-├── CONTENT_HANDOVER.md        # This file
-├── README.md                   # Main documentation (888 lines, comprehensive)
-├── CHANGELOG.md               # Version history (236 lines)
-├── CONTRIBUTING.md            # Contribution guidelines
-├── plugins/
-│   ├── README.md              # Plugin documentation (606 lines)
-│   ├── workflow/              # Task lifecycle (6 commands)
-│   ├── memory/                # Knowledge persistence (5 commands)
-│   ├── transition/            # Session boundaries (2 commands)
-│   ├── development/           # Code operations (7 commands, 3 agents)
-│   ├── system/                # Infrastructure (4 commands, 2 agents)
-│   └── setup/                 # Project initialization (5 commands)
-├── skills/
-│   ├── README.md              # Skills documentation
-│   ├── rag-implementation/
-│   ├── huggingface-transformers/
-│   ├── llm-evaluation/
-│   └── general-dev/           # Docker, SQL, API auth skills
-├── hooks/
-│   └── ruff-check-hook.sh     # Example hook
-├── docs/
-│   ├── mcp-setup.md           # MCP server integration guide
-│   └── demo-guide.md          # 5-minute demo
-├── .gitignore                 # Screenshots excluded from repo
-└── templates/                 # Project templates
-```
+**Key directories**:
+- `plugins/` - 6 core plugins (workflow, memory, transition, development, system, setup)
+- `examples/domain-adaptation/` - **KEY DIFFERENTIATOR** - quant (3 validators) + writing (3 skills)
+- `skills/` - 6 domain skills (ML/AI + general development)
+- `docs/` - MCP setup guide, demo guide
+- `hooks/` - Example pre-commit hook
 
 **GitHub Repository**: Ready for public release (open-source, MIT license)
 
@@ -336,17 +333,17 @@ claude-code-toolkit/
 **Post-Launch**:
 4. Blog series (6 posts based on angles above):
    - "We Used Claude Code for 6 Months. Here's What Actually Works."
-   - "How We Cut Claude Code Token Usage by 80%"
+   - **"Claude Code Isn't Just for Software: Adapting Workflows to Your Domain"** (KEY DIFFERENTIATOR)
    - "Why Your Claude Code Session Quality Drops (And How to Fix It)"
-   - "Zero Hallucinations in 25,000 Words: Our Fact Manifest System"
+   - "A Systematic Approach to Verification in AI-Assisted Writing"
    - "Building Claude Code Skills That Actually Help"
-   - "Organizing Your Claude Code Toolkit: Six Namespaces for Complete Coverage" (NEW)
+   - "Organizing Your Claude Code Toolkit: Six Namespaces for Complete Coverage"
 
 5. Technical deep-dives:
    - "The Explore-Plan-Next-Ship Workflow Explained"
    - "Context Window Management for Long Sessions"
-   - "Progressive Disclosure: The Right Knowledge at the Right Time"
-   - "Six Namespaces: Implementing Anthropic's Agent Architecture" (NEW)
+   - **"Domain Adaptation: From Software to Writing to Quant Research"** (NEW)
+   - "Six Namespaces: Implementing Anthropic's Agent Architecture"
 
 **GitHub-Specific**:
 6. Ensure README serves as effective landing page (currently comprehensive)
@@ -366,6 +363,6 @@ claude-code-toolkit/
 
 ---
 
-**Version**: 1.0
+**Version**: 1.1
 **Last Updated**: 2025-11-25
-**Status**: v1.2.0 production-ready (6 core plugins, 28 commands, 5 agents, 6 skills)
+**Status**: v1.2.0 production-ready (6 core plugins, 28 commands, 5 agents, 6 skills, 2 domain adaptation examples)
