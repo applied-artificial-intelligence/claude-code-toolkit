@@ -157,7 +157,7 @@ When adapting Claude Code to a new domain, where do you put domain knowledge?
 
 **The Insight**: General awareness isn't enough. You need specific, actionable checkpoints.
 
-**Evidence** (now included in `examples/domain-adaptation/`):
+**Evidence** (now included in `examples/`):
 
 **Quant Finance - 3 Validators with 21 specific patterns**:
 - `quant-ml-validator`: 7 look-ahead bias patterns (preprocessing leakage, survivorship bias, wrong CV...)
@@ -326,7 +326,7 @@ Stateless, terminal-only, context limits (~85% actual when Claude reports 70%), 
 
 **Key directories**:
 - `plugins/` - 6 core plugins (workflow, memory, transition, development, system, setup)
-- `examples/domain-adaptation/` - **KEY DIFFERENTIATOR** - quant (3 validators) + writing (3 skills)
+- `examples/` - **KEY DIFFERENTIATOR** - quant (3 validators) + writing (3 skills)
 - `skills/` - 6 domain skills (ML/AI + general development)
 - `docs/` - MCP setup guide, demo guide
 - `hooks/` - Example pre-commit hook

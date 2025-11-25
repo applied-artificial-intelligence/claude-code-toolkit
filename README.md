@@ -267,9 +267,8 @@ claude-code-toolkit/
 │   ├── system/            # Infrastructure (4 commands, 2 agents)
 │   └── setup/             # Project initialization (5 commands)
 ├── examples/              # Domain adaptation examples
-│   └── domain-adaptation/ # How to extend Claude Code beyond software
-│       ├── quant/         # Quantitative finance (3 validators)
-│       └── writing/       # Professional writing (3 skills)
+│   ├── quant/             # Quantitative finance (3 validators)
+│   └── writing/           # Professional writing (3 skills)
 ├── skills/                # Domain expertise (6 skills)
 │   ├── general-dev/       # Docker, SQL, API auth
 │   ├── rag-implementation/
@@ -609,7 +608,7 @@ Skills activate automatically when your query matches their domain:
 
 ### Domain Adaptation Examples
 
-**Claude Code isn't just for software.** The `examples/domain-adaptation/` directory shows how to extend Claude Code to other domains.
+**Claude Code isn't just for software.** The `examples/` directory shows how to extend Claude Code to other domains.
 
 **The Knowledge Encoding Problem**: When adapting to a new domain, where do you put domain knowledge?
 
@@ -623,20 +622,20 @@ Skills activate automatically when your query matches their domain:
 
 **Included Examples**:
 
-**Quantitative Finance** (`examples/domain-adaptation/quant/`)
+**Quantitative Finance** (`examples/quant/`)
 - 3 validators with 21 specific patterns
 - `quant-ml-validator`: Look-ahead bias, survivorship bias, wrong CV
 - `quant-backtest-validator`: Missing costs, unrealistic fills
 - `quant-risk-validator`: No kill switch, unlimited leverage
 - Each pattern: detection regex + quantified impact + specific fix
 
-**Professional Writing** (`examples/domain-adaptation/writing/`)
+**Professional Writing** (`examples/writing/`)
 - 3 framework skills
 - `pyramid-principle`: Barbara Minto's answer-first structure
 - `scqa-framework`: Situation-Complication-Question-Answer narrative
 - `plain-language`: Federal plain language guidelines
 
-See [examples/domain-adaptation/README.md](examples/domain-adaptation/README.md) for full documentation.
+See [examples/README.md](examples/README.md) for full documentation.
 
 ---
 
