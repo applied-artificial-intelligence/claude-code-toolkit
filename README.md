@@ -11,7 +11,7 @@
 
 A collection of plugins, skills, and patterns developed through 6+ months of daily Claude Code use. Copy what works, adapt to your needs.
 
-**What's included**: 23 commands, 5 agents, and 6 domain skills across 5 core plugins.
+**What's included**: 28 commands, 5 agents, and 6 domain skills across 6 core plugins.
 
 ### Design Goals
 
@@ -142,32 +142,74 @@ This toolkit wasn't built by reading Anthropic's documentation and implementing 
 
 ---
 
-## Architecture
+## Architecture: Six Namespaces for Complete Workflows
 
-### Component Structure
+The toolkit is organized into **six namespaces**, each implementing a distinct aspect of Anthropic's agent architecture recommendations:
+
+| Namespace | Purpose | Anthropic Pattern |
+|-----------|---------|-------------------|
+| **workflow** | Task execution lifecycle | Multi-context window workflows |
+| **memory** | Persistent knowledge | Memory tool patterns |
+| **transition** | Session boundaries | Context window handoffs |
+| **development** | Code operations | Subagent architecture |
+| **system** | Infrastructure | Quality gates & hooks |
+| **setup** | Project initialization | Progressive configuration |
+
+### Why These Six Namespaces?
+
+**Workflow** (`/workflow:*`) - The task execution lifecycle
+- Implements Anthropic's recommendation for "structured representation of the project"
+- Commands: `explore` → `plan` → `next` → `ship` + `work`, `spike`
+- State tracked in `state.json`, work breakdown in `implementation-plan.md`
+
+**Memory** (`/memory:*`) - Persistent project knowledge
+- Implements Anthropic's Memory Tool pattern: "ALWAYS VIEW YOUR MEMORY DIRECTORY BEFORE DOING ANYTHING ELSE"
+- Commands: `index`, `memory-update`, `memory-review`, `memory-gc`, `performance`
+- Knowledge persisted in `.claude/memory/` directory
+
+**Transition** (`/transition:*`) - Context window boundaries
+- Implements Anthropic's guidance: "Claude is adept at working across context window resets as long as clear instructions and todo lists are provided"
+- Commands: `handoff`, `continue`
+- State preserved in `.claude/transitions/` with timestamped handoff documents
+
+**Development** (`/development:*`) - Code operations with specialized agents
+- Implements Anthropic's subagent architecture: "specialized focus... restricted tool access"
+- Commands: `analyze`, `review`, `test`, `fix`, `git`, `docs`, `prepare-review`
+- Agents: `architect`, `test-engineer`, `code-reviewer`
+
+**System** (`/system:*`) - Infrastructure and quality
+- Implements Anthropic's quality gates: "pre-commit hooks to enforce code quality"
+- Commands: `setup`, `status`, `audit`, `cleanup`
+- Agents: `auditor`, `reasoning-specialist`
+
+**Setup** (`/setup:*`) - Project initialization
+- Implements progressive configuration for different project types
+- Commands: `setup:python`, `setup:javascript`, `setup:existing`, `setup:user`, `setup:statusline`
+- Auto-detects project type and generates appropriate configuration
+
+### Directory Structure
 
 ```
 claude-code-toolkit/
-├── plugins/                # Core plugins (5 plugins, 23 commands)
-│   ├── system/            # System configuration (3 commands, 2 agents)
-│   ├── workflow/          # Development workflow (6 commands)
-│   ├── development/       # Code operations (7 commands, 3 agents)
+├── plugins/                # 6 namespaced plugins (28 commands)
+│   ├── workflow/          # Task lifecycle (6 commands)
+│   ├── memory/            # Knowledge persistence (5 commands)
 │   ├── transition/        # Session boundaries (2 commands)
-│   └── memory/            # Knowledge persistence (5 commands)
-├── skills/                # Domain skills (6 skills)
-│   ├── ml-ai/             # ML/AI skills
-│   │   ├── rag-implementation/
-│   │   ├── huggingface-transformers/
-│   │   └── llm-evaluation/
-│   └── general-dev/       # General development skills
+│   ├── development/       # Code operations (7 commands, 3 agents)
+│   ├── system/            # Infrastructure (4 commands, 2 agents)
+│   └── setup/             # Project initialization (5 commands)
+├── skills/                # Domain expertise (6 skills)
+│   ├── llm-evaluation/
+│   ├── rag-implementation/
+│   ├── huggingface-transformers/
+│   └── general-dev/
 │       ├── docker-optimization/
 │       ├── sql-optimization/
 │       └── api-authentication/
-├── hooks/                 # Example hooks (1 hook)
-│   └── ruff-check-hook.sh       # Lint Python code
-└── docs/                  # Documentation
-    ├── mcp-setup.md       # MCP server integration guide
-    └── [additional docs]
+├── hooks/                 # Quality gates (1 example)
+│   └── ruff-check-hook.sh
+└── docs/                  # Integration guides
+    └── mcp-setup.md
 ```
 
 ### Stateless Execution Model
@@ -255,7 +297,8 @@ Add to project's `.claude/settings.json`:
     "workflow@local": true,
     "development@local": true,
     "transition@local": true,
-    "memory@local": true
+    "memory@local": true,
+    "setup@local": true
   }
 }
 ```
@@ -337,40 +380,60 @@ The framework follows an `explore` → `plan` → `next` → `ship` pattern:
 # Archives work unit
 ```
 
-### Command Reference
+### Command Reference by Namespace
 
-**System Commands**:
-- `/system:setup` - Project initialization (auto-detects Python/JavaScript)
-- `/system:status` - Project and system health check
-- `/system:audit` - Framework compliance validation
-- `/system:cleanup` - Remove generated clutter
+**Workflow** - Task execution lifecycle (6 commands)
+| Command | Purpose |
+|---------|---------|
+| `/workflow:explore` | Analyze requirements, create work breakdown |
+| `/workflow:plan` | Generate implementation plan with dependencies |
+| `/workflow:next` | Execute next available task |
+| `/workflow:ship` | Deliver completed work (PR, commit, deploy) |
+| `/workflow:work` | Manage work units and parallel streams |
+| `/workflow:spike` | Time-boxed exploration in isolated branch |
 
-**Workflow Commands**:
-- `/workflow:explore` - Analyze requirements and create work breakdown
-- `/workflow:plan` - Generate implementation plan with dependencies
-- `/workflow:next` - Execute next available task
-- `/workflow:ship` - Deliver completed work
-- `/workflow:work` - Manage work units and parallel streams
-- `/workflow:spike` - Time-boxed exploration in isolated branch
+**Memory** - Persistent knowledge (5 commands)
+| Command | Purpose |
+|---------|---------|
+| `/memory:index` | Create persistent project understanding |
+| `/memory:memory-update` | Update memory with new insights |
+| `/memory:memory-review` | Display current memory state |
+| `/memory:memory-gc` | Garbage collect stale entries |
+| `/memory:performance` | View token usage and metrics |
 
-**Development Commands**:
-- `/development:analyze` - Deep codebase analysis
-- `/development:review` - Code quality and security review
-- `/development:test` - Test creation and TDD workflow
-- `/development:fix` - Automated debugging and fixes
-- `/development:git` - Git operations (commit, PR, issues)
-- `/development:docs` - Documentation operations
+**Transition** - Session boundaries (2 commands)
+| Command | Purpose |
+|---------|---------|
+| `/transition:handoff` | Create session handoff with context analysis |
+| `/transition:continue` | Resume from previous session handoff |
 
-**Transition Commands**:
-- `/transition:handoff` - Create session handoff with context analysis
-- `/transition:continue` - Resume from previous session handoff
+**Development** - Code operations (7 commands)
+| Command | Purpose |
+|---------|---------|
+| `/development:analyze` | Deep codebase analysis |
+| `/development:review` | Code quality and security review |
+| `/development:test` | Test creation and TDD workflow |
+| `/development:fix` | Automated debugging and fixes |
+| `/development:git` | Git operations (commit, PR, issues) |
+| `/development:docs` | Documentation operations |
+| `/development:prepare-review` | Prepare code for external review |
 
-**Memory Commands**:
-- `/memory:index` - Create persistent project understanding
-- `/memory:memory-update` - Update memory with new insights
-- `/memory:memory-review` - Display current memory state
-- `/memory:memory-gc` - Garbage collect stale entries
-- `/memory:performance` - View token usage and metrics
+**System** - Infrastructure (4 commands)
+| Command | Purpose |
+|---------|---------|
+| `/system:setup` | Project initialization (auto-detects type) |
+| `/system:status` | Project and system health check |
+| `/system:audit` | Framework compliance validation |
+| `/system:cleanup` | Remove generated clutter |
+
+**Setup** - Project initialization (5 commands)
+| Command | Purpose |
+|---------|---------|
+| `/setup:python` | Python project configuration |
+| `/setup:javascript` | JavaScript/TypeScript configuration |
+| `/setup:existing` | Configure existing project |
+| `/setup:user` | User-level global settings |
+| `/setup:statusline` | Status line customization |
 
 **Note**: For semantic code understanding, use Serena MCP directly. See [docs/mcp-setup.md](docs/mcp-setup.md) for configuration.
 
@@ -671,7 +734,8 @@ Configure in `.claude/settings.json`:
     "workflow@local": true,
     "development@local": true,
     "transition@local": true,
-    "memory@local": true
+    "memory@local": true,
+    "setup@local": true
   },
   "mcpServers": {
     "serena": {
@@ -720,11 +784,12 @@ Global user settings in `~/.claude/CLAUDE.md`:
 
 Each plugin has detailed README:
 
-- [system plugin](plugins/system/README.md) - System utilities
-- [workflow plugin](plugins/workflow/README.md) - Development workflow
-- [development plugin](plugins/development/README.md) - Code operations
+- [workflow plugin](plugins/workflow/README.md) - Task execution lifecycle
+- [memory plugin](plugins/memory/README.md) - Persistent knowledge
 - [transition plugin](plugins/transition/README.md) - Session boundaries
-- [memory plugin](plugins/memory/README.md) - Context management
+- [development plugin](plugins/development/README.md) - Code operations
+- [system plugin](plugins/system/README.md) - Infrastructure & quality
+- [setup plugin](plugins/setup/README.md) - Project initialization
 
 ### Architecture Documentation
 
@@ -835,7 +900,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
     "workflow@local": true,
     "development@local": true,
     "transition@local": true,
-    "memory@local": true
+    "memory@local": true,
+    "setup@local": true
   }
 }
 ```
