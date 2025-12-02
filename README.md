@@ -469,6 +469,8 @@ The framework follows an `explore` → `plan` → `next` → `ship` pattern:
 # Archives work unit
 ```
 
+![Workflow sequence showing explore, plan, and next phases](docs/images/02_workflow_sequence.png)
+
 ### Command Reference by Namespace
 
 **Workflow** - Task execution lifecycle (6 commands)
@@ -719,6 +721,8 @@ chmod +x ~/.claude/hooks/ruff-check-hook.sh
 - Clean continuation after `/clear`
 - **Audit trail**: Captures thinking, not just changes
 
+![Handoff loaded showing restored context and next steps](docs/images/28_handoff_loaded.png)
+
 ---
 
 ### Complete Workflow: /explore → /plan → /next
@@ -748,6 +752,8 @@ chmod +x ~/.claude/hooks/ruff-check-hook.sh
 - Task breakdown with `/plan`
 - Incremental execution with `/next`
 - Progress tracking and state management
+
+![Plan overview showing phases, tasks, and timeline](docs/images/15_plan_overview.png)
 
 ---
 

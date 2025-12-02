@@ -83,15 +83,13 @@ secrets/
 
 # Screenshots and media (keep local, don't publish)
 screenshots/
-*.png
-*.jpg
-*.jpeg
-*.gif
 *.mp4
 *.mov
 *.avi
 *.webm
-*.webp
+
+# Allow images in docs folder
+!docs/images/
 
 # Ruff cache
 .ruff_cache/
