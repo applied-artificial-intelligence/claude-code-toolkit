@@ -82,7 +82,7 @@ secrets/
 .archive/
 
 # Screenshots and media (keep local, don't publish)
-screenshots/
+assets/screenshots/
 *.mp4
 *.mov
 *.avi

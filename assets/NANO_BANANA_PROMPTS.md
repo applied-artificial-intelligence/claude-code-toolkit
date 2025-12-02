@@ -62,60 +62,60 @@ Dimensions: 1200x400px
 
 ### Prompt:
 ```
-Create a 2x3 grid showing the six Claude Code Toolkit plugins.
-
-Title: "Six Plugins for Complete Workflows"
-
-Layout: 2 rows x 3 columns grid. Flat 2D.
-
-Row 1 (left to right):
-1. "workflow"
-   - Color: #1E3A5F (navy)
-   - Below: "Task lifecycle"
-   - Small text: "explore, plan, next, ship"
-
-2. "memory"
-   - Color: #2E5A7F
-   - Below: "Knowledge persistence"
-   - Small text: "index, review, gc"
-
-3. "transition"
-   - Color: #3D7EAA
-   - Below: "Session boundaries"
-   - Small text: "handoff, continue"
-
-Row 2 (left to right):
-4. "development"
-   - Color: #4A9AC7
-   - Below: "Code operations"
-   - Small text: "analyze, review, test, fix"
-
-5. "system"
-   - Color: #64B5F6
-   - Below: "Infrastructure"
-   - Small text: "setup, audit, status"
-
-6. "setup"
-   - Color: #90CAF9 (lightest)
-   - Below: "Project initialization"
-   - Small text: "python, javascript, existing"
-
-All boxes same size, equal spacing.
-
-One insight line below (small, gray):
-"Each plugin addresses a distinct aspect of development workflow."
-
-White background.
-
-Style:
-- Grid layout, equal weight boxes
-- Color progression from dark (core) to light (supporting)
-- Command names in smaller text
-- Clean, organized
-
-Bottom-right corner: "Applied AI" in small gray text
-
-Dimensions: 1100x550px
+    Create a 2x3 grid showing the six Claude Code Toolkit plugins.
+    
+    Title: "Six Plugins for Complete Workflows"
+    
+    Layout: 2 rows x 3 columns grid. Flat 2D.
+    
+    Row 1 (left to right):
+    1. "workflow"
+       - Color: #1E3A5F (navy)
+       - Below: "Task lifecycle"
+       - Small text: "explore, plan, next, ship"
+    
+    2. "memory"
+       - Color: #2E5A7F
+       - Below: "Knowledge persistence"
+       - Small text: "index, review, gc"
+    
+    3. "transition"
+       - Color: #3D7EAA
+       - Below: "Session boundaries"
+       - Small text: "handoff, continue"
+    
+    Row 2 (left to right):
+    4. "development"
+       - Color: #4A9AC7
+       - Below: "Code operations"
+       - Small text: "analyze, review, test, fix"
+    
+    5. "system"
+       - Color: #64B5F6
+       - Below: "Infrastructure"
+       - Small text: "setup, audit, status"
+    
+    6. "setup"
+       - Color: #90CAF9 (lightest)
+       - Below: "Project initialization"
+       - Small text: "python, javascript, existing"
+    
+    All boxes same size, equal spacing.
+    
+    One insight line below (small, gray):
+    "Each plugin addresses a distinct aspect of development workflow."
+    
+    White background.
+    
+    Style:
+    - Grid layout, equal weight boxes
+    - Color progression from dark (core) to light (supporting)
+    - Command names in smaller text
+    - Clean, organized
+    
+    Bottom-right corner: "Applied AI" in small gray text
+    
+    Dimensions: 1100x550px
 ```
 
 ---
@@ -282,46 +282,46 @@ Dimensions: 800x550px
 
 ### Prompt:
 ```
-Create a two-column comparison showing toolkit alignment with Anthropic patterns.
-
-Title: "Anthropic Best Practices Alignment"
-
-Layout: Two columns side by side. Flat 2D.
-
-Left column header: "Anthropic Recommendation"
-- Color: #90CAF9 background
-- Items (stacked vertically):
-  1. "Multi-context window workflows"
-  2. "JSON + Notes + Git state"
-  3. "Progressive disclosure"
-  4. "Memory tool patterns"
-  5. "Subagent architecture"
-
-Right column header: "Toolkit Implementation"
-- Color: #1E3A5F background, white text
-- Items (stacked vertically, aligned with left):
-  1. "explore → plan → next → ship"
-  2. "state.json + .md files + commits"
-  3. "Skills load only when relevant"
-  4. ".claude/memory/ directory"
-  5. "5 specialized agents"
-
-Connect each left item to its right counterpart with subtle horizontal lines or arrows.
-
-One insight line below (small, gray):
-"Same problems, same solutions—patterns validated through 6+ months of daily use."
-
-White background.
-
-Style:
-- Two-column mapping
-- Left light, right dark (recommendation → implementation)
-- Alignment lines show direct correspondence
-- Professional, credible
-
-Bottom-right corner: "Applied AI" in small gray text
-
-Dimensions: 1100x500px
+    Create a two-column comparison showing toolkit alignment with Anthropic patterns.
+    
+    Title: "Anthropic Best Practices Alignment"
+    
+    Layout: Two columns side by side. Flat 2D.
+    
+    Left column header: "Anthropic Recommendation"
+    - Color: #90CAF9 background
+    - Items (stacked vertically):
+      1. "Multi-context window workflows"
+      2. "JSON + Notes + Git state"
+      3. "Progressive disclosure"
+      4. "Memory tool patterns"
+      5. "Subagent architecture"
+    
+    Right column header: "Toolkit Implementation"
+    - Color: #1E3A5F background, white text
+    - Items (stacked vertically, aligned with left):
+      1. "explore → plan → next → ship"
+      2. "state.json + .md files + commits"
+      3. "Skills load only when relevant"
+      4. ".claude/memory/ directory"
+      5. "5 specialized agents"
+    
+    Connect each left item to its right counterpart with subtle horizontal lines or arrows.
+    
+    One insight line below (small, gray):
+    "Same problems, same solutions—patterns validated through 6+ months of daily use."
+    
+    White background.
+    
+    Style:
+    - Two-column mapping
+    - Left light, right dark (recommendation → implementation)
+    - Alignment lines show direct correspondence
+    - Professional, credible
+    
+    Bottom-right corner: "Applied AI" in small gray text
+    
+    Dimensions: 1100x500px
 ```
 
 ---

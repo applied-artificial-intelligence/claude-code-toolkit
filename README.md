@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-2.0%2B-blue)](https://docs.claude.com/claude-code)
 
+![Task Execution Workflow: Explore → Plan → Next → Ship](assets/visualizations/01-workflow.png)
+
 ---
 
 ## Overview
@@ -109,6 +111,8 @@ But it has real limitations you'll encounter repeatedly. This toolkit provides p
 ## Anthropic Best Practices Alignment
 
 This toolkit implements patterns and recommendations from Anthropic's official Claude Code documentation. It represents "what Anthropic says you should be doing, here implemented."
+
+![Anthropic Best Practices Alignment](assets/visualizations/06-best-practices.png)
 
 ### Multi-Context Window Workflows
 
@@ -220,6 +224,8 @@ The toolkit is organized into **six plugins**, each addressing a distinct aspect
 | **development** | Code operations | Subagent architecture |
 | **system** | Infrastructure | Quality gates & hooks |
 | **setup** | Project initialization | Progressive configuration |
+
+![Six Plugins for Complete Workflows](assets/visualizations/02-plugins.png)
 
 ### Why These Six Plugins?
 
@@ -469,7 +475,7 @@ The framework follows an `explore` → `plan` → `next` → `ship` pattern:
 # Archives work unit
 ```
 
-![Workflow sequence showing explore, plan, and next phases](docs/images/02_workflow_sequence.png)
+![Workflow sequence showing explore, plan, and next phases](assets/screenshots/02_workflow_sequence.png)
 
 ### Command Reference by Namespace
 
@@ -721,7 +727,9 @@ chmod +x ~/.claude/hooks/ruff-check-hook.sh
 - Clean continuation after `/clear`
 - **Audit trail**: Captures thinking, not just changes
 
-![Handoff loaded showing restored context and next steps](docs/images/28_handoff_loaded.png)
+![Context Management cycle](assets/visualizations/04-transitions.png)
+
+![Handoff loaded showing restored context and next steps](assets/screenshots/28_handoff_loaded.png)
 
 ---
 
@@ -753,7 +761,7 @@ chmod +x ~/.claude/hooks/ruff-check-hook.sh
 - Incremental execution with `/next`
 - Progress tracking and state management
 
-![Plan overview showing phases, tasks, and timeline](docs/images/15_plan_overview.png)
+![Plan overview showing phases, tasks, and timeline](assets/screenshots/15_plan_overview.png)
 
 ---
 
