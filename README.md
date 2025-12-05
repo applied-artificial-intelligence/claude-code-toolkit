@@ -225,7 +225,7 @@ The toolkit is organized into **six plugins**, each addressing a distinct aspect
 | **system** | Infrastructure | Quality gates & hooks |
 | **setup** | Project initialization | Progressive configuration |
 
-![Six Plugins for Complete Workflows](assets/visualizations/02-plugins.png)
+![Six Plugins for Complete Workflows](assets/visualizations/02-plugins.jpeg)
 
 ### Why These Six Plugins?
 
